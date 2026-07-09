@@ -1,0 +1,189 @@
+@import "tailwindcss";
+
+/* ============================================
+   Club Deportivo Marathón — Design System
+   "Furia Verde" Theme
+   ============================================ */
+
+@theme inline {
+  /* Color palette */
+  --color-marathon-darkest: #012919;
+  --color-marathon-dark: #01402E;
+  --color-marathon-green: #2E9C3F;
+  --color-marathon-lime: #92BF4E;
+  --color-marathon-light: #F3F3F3;
+
+  /* Semantic tokens */
+  --color-background: #012919;
+  --color-foreground: #F3F3F3;
+  --color-muted: #1a4a38;
+  --color-accent: #2E9C3F;
+  --color-accent-foreground: #F3F3F3;
+
+  /* Typography */
+  --font-heading: var(--font-outfit);
+  --font-body: var(--font-inter);
+  --font-antonio: var(--font-antonio);
+
+  /* Spacing scale */
+  --spacing-section: 6rem;
+  --spacing-section-sm: 4rem;
+}
+
+/* ============================================
+   Base Styles
+   ============================================ */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #2E9C3F #012919;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #012919;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #2E9C3F;
+  border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #92BF4E;
+}
+
+::selection {
+  background-color: rgba(46, 156, 63, 0.3);
+  color: #F3F3F3;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-body), system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+/* ============================================
+   Typography
+   ============================================ */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading), system-ui, sans-serif;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+/* ============================================
+   Custom Animations
+   ============================================ */
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(46, 156, 63, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(46, 156, 63, 0.6); }
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes scroll-bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(10px); }
+  60% { transform: translateY(5px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-gradient-shift {
+  background-size: 200% 200%;
+  animation: gradient-shift 8s ease infinite;
+}
+
+.animate-scroll-bounce {
+  animation: scroll-bounce 2s ease-in-out infinite;
+}
+
+/* ============================================
+   Glassmorphism Utility
+   ============================================ */
+
+.glass {
+  background: rgba(1, 41, 25, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(46, 156, 63, 0.15);
+}
+
+.glass-card {
+  background: rgba(1, 64, 46, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(146, 191, 78, 0.1);
+}
+
+.liquid-glass-pill {
+  background: rgba(1, 41, 25, 0.45);
+  backdrop-filter: blur(20px) saturate(1.6);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  border: 1px solid rgba(146, 191, 78, 0.12);
+  box-shadow:
+    0 4px 30px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.match-card-glow {
+  filter: drop-shadow(0 0 20px rgba(46, 156, 63, 0.08));
+  transition: filter 0.5s ease;
+}
+
+.match-card-glow:hover {
+  filter: drop-shadow(0 0 30px rgba(46, 156, 63, 0.2));
+}
+
+/* ============================================
+   Gradient Text
+   ============================================ */
+
+.text-gradient {
+  background: linear-gradient(135deg, #2E9C3F, #92BF4E);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-light {
+  background: linear-gradient(135deg, #92BF4E, #F3F3F3);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.antonio-outline {
+  font-family: "Antonio", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: normal;
+}
+
