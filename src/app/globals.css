@@ -1,10 +1,5 @@
 @import "tailwindcss";
 
-/* ============================================
-   Club Deportivo Marathón — Design System
-   "Furia Verde" Theme
-   ============================================ */
-
 @theme inline {
   /* Color palette */
   --color-marathon-darkest: #012919;
@@ -24,6 +19,8 @@
   --font-heading: var(--font-outfit);
   --font-body: var(--font-inter);
   --font-antonio: var(--font-antonio);
+  --font-elrotex: var(--font-elrotex);
+  --font-elrotex-swash: var(--font-elrotex-swash);
 
   /* Spacing scale */
   --spacing-section: 6rem;
@@ -185,5 +182,13 @@ h1, h2, h3, h4, h5, h6 {
   font-optical-sizing: auto;
   font-weight: 700;
   font-style: normal;
+}
+
+.font-elrotex {
+  font-family: var(--font-elrotex), sans-serif !important;
+}
+
+.font-elrotex-swash {
+  font-family: var(--font-elrotex-swash), sans-serif !important;
 }
 

@@ -1,6 +1,9 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useRef } from "react";
 import { CLUB, NAV_LINKS, SOCIAL_LINKS } from "@/lib/constants";
 import { Heart } from "lucide-react";
+import { gsap, ScrollTrigger } from "@/hooks/useGsap";
 
 // Custom SVG social icons (lucide-react removed brand icons)
 function InstagramIcon({ size = 18 }: { size?: number }) {
@@ -47,9 +50,58 @@ const socialIcons: Record<string, React.ReactNode> = {
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const footerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!footerRef.current) return;
+
+    const ctx = gsap.context((self) => {
+      // Split characters for stagger reveal inside the scoped element
+      const words = self.selector ? self.selector(".footer-chant span") : [];
+
+      if (words.length > 0) {
+        gsap.fromTo(
+          words,
+          { opacity: 0, y: 30, scale: 0.8 },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.7,
+            stagger: 0.08,
+            ease: "back.out(1.4)",
+            scrollTrigger: {
+              trigger: ".footer-chant-container",
+              start: "top 90%",
+              toggleActions: "play none none none",
+            },
+          }
+        );
+      }
+
+      // Pulse glow behind the chant
+      gsap.fromTo(
+        ".footer-chant-glow",
+        { opacity: 0, scale: 0.7 },
+        {
+          opacity: 0.15,
+          scale: 1,
+          duration: 1.2,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: ".footer-chant-container",
+            start: "top 85%",
+            toggleActions: "play none none none",
+          },
+        }
+      );
+    }, footerRef.current);
+
+    return () => ctx.revert();
+  }, []);
 
   return (
-    <footer className="relative bg-marathon-darkest border-t border-marathon-green/10">
+    <footer ref={footerRef} className="relative bg-marathon-darkest border-t border-marathon-green/10 overflow-hidden">
       {/* Gradient top border */}
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-marathon-green/50 to-transparent" />
 
@@ -59,11 +111,12 @@ export default function Footer() {
           {/* Brand Column */}
           <div className="lg:col-span-1">
             <div className="flex items-center gap-3 mb-4">
-              <div className="relative w-10 h-10 flex items-center justify-center">
-                <div className="absolute inset-0 bg-marathon-green rounded-lg rotate-45" />
-                <span className="relative text-marathon-light font-heading font-black text-lg z-10">
-                  M
-                </span>
+              <div className="relative w-20 h-20 flex items-center justify-center">
+                <img
+                  src="/assets/brand/escudonormal_blanco.svg"  // Asegúrate de tener el logo en esta ruta
+                  alt="CD Marathon"
+                  className="w-50 h-50 object-contain"
+                />
               </div>
               <div>
                 <p className="font-heading font-bold text-marathon-light text-sm">
@@ -140,6 +193,21 @@ export default function Footer() {
               +{CLUB.instagramFollowers} seguidores en Instagram
             </p>
           </div>
+        </div>
+
+        {/* Giant "SOY DEL VERDE SOY FELIZ" Banner using Elrotex Font */}
+        <div className="footer-chant-container relative py-10 my-4 flex flex-col items-center justify-center text-center overflow-visible select-none">
+          <div className="footer-chant-glow absolute inset-0 bg-marathon-lime/10 rounded-full blur-[80px] pointer-events-none w-[80%] mx-auto h-[120px]" />
+          <h2
+            className="footer-chant relative z-10 text-4xl sm:text-5xl md:text-7xl lg:text-[5.5rem] tracking-wider text-marathon-lime font-normal drop-shadow-[0_5px_15px_rgba(146,191,78,0.2)] flex flex-wrap justify-center gap-x-4 gap-y-2"
+            style={{ fontFamily: "var(--font-elrotex), sans-serif", fontWeight: "normal" }}
+          >
+            <span className="will-change-transform">SOY</span>
+            <span className="will-change-transform">DEL</span>
+            <span className="text-marathon-light will-change-transform">VERDE</span>
+            <span className="will-change-transform">SOY</span>
+            <span className="will-change-transform">FELIZ</span>
+          </h2>
         </div>
 
         {/* Bottom Bar */}

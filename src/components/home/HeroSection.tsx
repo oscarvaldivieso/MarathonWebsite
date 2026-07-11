@@ -1,9 +1,9 @@
 "use client";
 
-import React from "react";
-import { motion } from "framer-motion";
+import React, { useRef, useEffect } from "react";
 import { ChevronDown, Clock, MapPin, Zap, ArrowRight } from "lucide-react";
 import { CLUB, NEXT_MATCH } from "@/lib/constants";
+import { gsap, ScrollTrigger } from "@/hooks/useGsap";
 import Image from "next/image";
 
 function getDaysUntil(dateStr: string): number {
@@ -24,50 +24,247 @@ function formatMatchDate(dateStr: string): string {
 
 export default function HeroSection() {
   const daysUntil = getDaysUntil(NEXT_MATCH.date);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (!sectionRef.current) return;
+
+    const ctx = gsap.context(() => {
+      // ── ENTRANCE TIMELINE ──────────────────────────────────────
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+
+      // 1. Background cinematic zoom-out
+      tl.fromTo(
+        ".hero-bg-img",
+        { scale: 1.2 },
+        { scale: 1, duration: 2, ease: "power2.out" },
+        0
+      );
+
+      // 2. Overlay fade
+      tl.fromTo(
+        ".hero-overlay",
+        { opacity: 0 },
+        { opacity: 1, duration: 1.2 },
+        0.1
+      );
+
+      // 3. MONSTRUO VERDE text — scale up + fade
+      tl.fromTo(
+        ".hero-outline-text",
+        { opacity: 0, scale: 0.7 },
+        { opacity: 1, scale: 1, duration: 1.4, ease: "power4.out" },
+        0.3
+      );
+
+      // 4. Players — dramatic rise from below
+      tl.fromTo(
+        ".hero-players",
+        { opacity: 0, y: 120 },
+        { opacity: 1, y: 0, duration: 1.2, ease: "power4.out" },
+        0.5
+      );
+
+      // 5. Match card — stagger broadcast reveal
+      tl.fromTo(
+        ".hero-match-card",
+        { opacity: 0, x: 50, y: 20 },
+        { opacity: 1, x: 0, y: 0, duration: 0.8 },
+        0.9
+      );
+
+      tl.fromTo(
+        ".match-card-header, .match-card-teams, .match-card-footer",
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.4, stagger: 0.12 },
+        1.1
+      );
+
+      // 6. Scroll indicator
+      tl.fromTo(
+        ".hero-scroll-indicator",
+        { opacity: 0, y: -10 },
+        { opacity: 1, y: 0, duration: 0.5 },
+        1.6
+      );
+
+      // ── SCROLL-DRIVEN PARALLAX ─────────────────────────────────
+      // Background moves slower = parallax depth
+      gsap.to(".hero-bg-img", {
+        yPercent: 20,
+        ease: "none",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top top",
+          end: "bottom top",
+          scrub: true,
+        },
+      });
+
+      // MONSTRUO VERDE text shifts horizontally on scroll
+      gsap.to(".hero-outline-text", {
+        xPercent: -15,
+        ease: "none",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top top",
+          end: "bottom top",
+          scrub: 1,
+        },
+      });
+
+      // Background floating Elrotex texts parallax
+      gsap.to(".hero-bg-text-left", {
+        yPercent: -50,
+        xPercent: -10,
+        rotation: -25,
+        ease: "none",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top top",
+          end: "bottom top",
+          scrub: true,
+        }
+      });
+
+      gsap.to(".hero-bg-text-right", {
+        yPercent: -35,
+        xPercent: 15,
+        rotation: 35,
+        ease: "none",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top top",
+          end: "bottom top",
+          scrub: true,
+        }
+      });
+
+      gsap.to(".hero-bg-text-center-left", {
+        yPercent: -60,
+        xPercent: -20,
+        rotation: -10,
+        ease: "none",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top top",
+          end: "bottom top",
+          scrub: true,
+        }
+      });
+
+      gsap.to(".hero-bg-text-center-right", {
+        yPercent: -45,
+        xPercent: 25,
+        rotation: 15,
+        ease: "none",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top top",
+          end: "bottom top",
+          scrub: true,
+        }
+      });
+
+      // Players image has subtle upward parallax (moves faster)
+      gsap.to(".hero-players", {
+        yPercent: -8,
+        ease: "none",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top top",
+          end: "bottom top",
+          scrub: true,
+        },
+      });
+
+
+
+      // ── FLOATING PARTICLES ─────────────────────────────────────
+      gsap.utils.toArray<HTMLElement>(".hero-particle").forEach((particle, i) => {
+        gsap.to(particle, {
+          y: -30,
+          opacity: 0.6,
+          duration: 3 + i * 0.5,
+          repeat: -1,
+          yoyo: true,
+          ease: "sine.inOut",
+          delay: i * 0.3,
+        });
+      });
+
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
 
   return (
     <section
+      ref={sectionRef}
       id="hero"
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
     >
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
-        <Image
-          src="/assets/backgrounds/Image.png"
-          alt="Fondo Marathón"
-          fill
-          className="object-cover object-center"
-          priority
-        />
-        <div className="absolute inset-0 bg-marathon-darkest/75 mix-blend-multiply" />
+        <div className="hero-bg-img absolute inset-0">
+          <Image
+            src="/assets/backgrounds/Image.png"
+            alt="Fondo Marathón"
+            fill
+            className="object-cover object-center"
+            priority
+          />
+        </div>
+        <div className="hero-overlay absolute inset-0 bg-marathon-darkest/75 mix-blend-multiply" />
       </div>
 
-      {/* Decorative Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {/* Decorative Elements & Floating Elrotex Background Text Pattern */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full bg-marathon-green/5 blur-3xl" />
         <div className="absolute -bottom-60 -left-60 w-[800px] h-[800px] rounded-full bg-marathon-lime/5 blur-3xl" />
 
+        {/* Floating Elrotex background texts */}
+        <div
+          className="hero-bg-text-left absolute top-[15%] left-[5%] text-white/[0.02] text-6xl md:text-8xl select-none origin-center whitespace-nowrap will-change-transform"
+          style={{ fontFamily: "var(--font-elrotex), sans-serif", transform: "rotate(-15deg)" }}
+        >
+          MARATHON
+        </div>
+
+        <div
+          className="hero-bg-text-right absolute top-[25%] right-[8%] text-white/[0.015] text-5xl md:text-7xl select-none origin-center whitespace-nowrap will-change-transform"
+          style={{ fontFamily: "var(--font-elrotex), sans-serif", transform: "rotate(25deg)" }}
+        >
+          1925
+        </div>
+
+        <div
+          className="hero-bg-text-center-left absolute bottom-[35%] left-[8%] text-white/[0.02] text-7xl md:text-9xl select-none origin-center whitespace-nowrap will-change-transform"
+          style={{ fontFamily: "var(--font-elrotex), sans-serif", transform: "rotate(-8deg)" }}
+        >
+          CD M
+        </div>
+
+        <div
+          className="hero-bg-text-center-right absolute bottom-[20%] right-[5%] text-white/[0.015] text-6xl md:text-8xl select-none origin-center whitespace-nowrap will-change-transform"
+          style={{ fontFamily: "var(--font-elrotex), sans-serif", transform: "rotate(12deg)" }}
+        >
+          FURIA VERDE
+        </div>
+
+        {/* GSAP-driven particles */}
         {[...Array(6)].map((_, i) => (
-          <motion.div
+          <div
             key={i}
-            className="absolute w-1 h-1 bg-marathon-lime/30 rounded-full"
+            className="hero-particle absolute w-1 h-1 bg-marathon-lime/30 rounded-full opacity-20"
             style={{
               top: `${15 + i * 15}%`,
               left: `${10 + i * 16}%`,
             }}
-            animate={{
-              y: [0, -30, 0],
-              opacity: [0.2, 0.6, 0.2],
-            }}
-            transition={{
-              duration: 3 + i * 0.5,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: i * 0.3,
-            }}
           />
         ))}
 
+        {/* Diagonal lines pattern */}
         <div className="absolute inset-0 opacity-[0.02]"
           style={{
             backgroundImage: `repeating-linear-gradient(
@@ -86,27 +283,18 @@ export default function HeroSection() {
         {/* Interactive Players and Outline Text Centerpiece */}
         <div className="relative w-full h-[55vh] sm:h-[65vh] md:h-[72vh] flex items-end justify-center select-none overflow-visible mt-auto">
           {/* Giant Outlined Text Behind Players */}
-          <motion.div
-            className="absolute inset-x-0 top-1/4 -translate-y-1/2 flex items-center justify-center antonio-outline font-bold text-5xl sm:text-7xl md:text-[10rem] lg:text-[15.5rem] tracking-normal select-none pointer-events-none text-[#ffffff]/[0.03] whitespace-nowrap z-0"
+          <div
+            className="hero-outline-text absolute inset-x-0 top-1/4 -translate-y-1/2 flex items-center justify-center antonio-outline font-bold text-5xl sm:text-7xl md:text-[10rem] lg:text-[15.5rem] tracking-normal select-none pointer-events-none text-[#ffffff]/[0.03] whitespace-nowrap z-0 will-change-transform"
             style={{
               WebkitTextStroke: "2px rgba(255, 255, 255, 0.24)",
               paintOrder: "stroke fill"
             }}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
           >
             MONSTRUO VERDE
-          </motion.div>
+          </div>
 
           {/* Players Image */}
-          <motion.div
-            className="relative z-10 w-full h-full filter drop-shadow-[0_20px_50px_rgba(46,156,63,0.35)]"
-            initial={{ opacity: 0, y: 100 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ type: "spring", stiffness: 45, damping: 15, delay: 0.4 }}
-            whileHover={{ scale: 1.02 }}
-          >
+          <div className="hero-players relative z-10 w-full h-full filter drop-shadow-[0_20px_50px_rgba(46,156,63,0.35)] will-change-transform">
             <Image
               src="/assets/hero/players.png"
               alt="Jugadores del CD Marathón"
@@ -114,150 +302,119 @@ export default function HeroSection() {
               className="object-contain object-bottom"
               priority
             />
-          </motion.div>
+          </div>
         </div>
       </div>
 
       {/* ═══════════════════════════════════════════
           NEXT MATCH FLOATING CARD — Bottom Left
-          Broadcast-style immersive widget
+          Figma spec round card
           ═══════════════════════════════════════════ */}
-      <motion.div
-        className="absolute bottom-20 left-4 sm:left-8 lg:left-12 z-20 hidden sm:block"
-        initial={{ opacity: 0, x: -60, y: 20 }}
-        animate={{ opacity: 1, x: 0, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.8, ease: "easeOut" }}
-      >
-        <div className="match-card-glow relative w-[300px] group cursor-pointer">
+      <div className="hero-match-card absolute bottom-20 right-4 sm:right-8 lg:right-12 z-20 hidden mr-24 sm:block">
+        <div className="match-card-glow relative w-[320px] group cursor-pointer">
           {/* Animated border gradient */}
-          <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-br from-marathon-green via-marathon-lime/30 to-marathon-green/0 opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
+          <div className="absolute -inset-[1px] rounded-[1.75rem] bg-gradient-to-br from-marathon-green via-marathon-lime/30 to-marathon-green/0 opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
 
           {/* Card body */}
-          <div className="relative rounded-2xl overflow-hidden">
-            {/* Inner glass background */}
-            <div className="absolute inset-0 bg-marathon-darkest/80 backdrop-blur-2xl" />
+          <div className="relative rounded-[1.75rem] overflow-hidden bg-marathon-darkest border border-marathon-green/20">
 
-            {/* Diamond pattern overlay */}
-            <div
-              className="absolute inset-0 opacity-[0.03]"
-              style={{
-                backgroundImage: `linear-gradient(45deg, #2E9C3F 25%, transparent 25%, transparent 75%, #2E9C3F 75%),
-                  linear-gradient(45deg, #2E9C3F 25%, transparent 25%, transparent 75%, #2E9C3F 75%)`,
-                backgroundSize: "20px 20px",
-                backgroundPosition: "0 0, 10px 10px",
-              }}
-            />
+            {/* Branding Pattern Container */}
+            <div className="relative bg-gradient-to-b from-marathon-dark/85 to-marathon-darkest p-5 overflow-hidden border-b border-marathon-green/10 flex flex-col items-center min-h-[145px]">
 
-            {/* Content */}
-            <div className="relative">
-              {/* Header strip with pulsing indicator */}
-              <div className="flex items-center justify-between px-4 py-2.5 border-b border-marathon-green/10">
-                <div className="flex items-center gap-2">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-marathon-lime opacity-75" />
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-marathon-lime" />
-                  </span>
-                  <span className="text-[10px] font-heading font-bold uppercase tracking-[0.2em] text-marathon-lime">
-                    Matchday
+              {/* Pattern from public/assets/brand/pattern.png */}
+              <div className="absolute inset-0">
+                <Image
+                  src="/assets/brand/pattern.png"
+                  alt="Branding Pattern"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+
+              {/* Pulsing glow central */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[160px] h-[80px] bg-marathon-lime/10 rounded-full blur-[25px] pointer-events-none" />
+
+              {/* Confrontation row */}
+              <div className="match-card-teams relative z-10 w-full flex items-center justify-between gap-4 mt-2 max-w-[240px] mx-auto">
+                {/* Home team shield purely floating */}
+                <div className="flex justify-center flex-1">
+                  <div className="relative w-16 h-16 flex items-center justify-center shrink-0">
+                    <Image
+                      src="/assets/brand/escudo_normal.svg"
+                      alt="CD Marathón"
+                      width={90}
+                      height={90}
+                      className="object-contain filter drop-shadow-[0_4px_12px_rgba(46,156,63,0.25)]"
+                    />
+                  </div>
+                </div>
+
+                {/* VS - Elrotex Font */}
+                <div className="match-card-vs flex items-center justify-center shrink-0 select-none">
+                  <span
+                    className="text-4xl text-marathon-lime drop-shadow-[0_2px_8px_rgba(146,191,78,0.4)] tracking-wide"
+                    style={{ fontFamily: "var(--font-elrotex), sans-serif" }}
+                  >
+                    VS
                   </span>
                 </div>
-                <span className="text-[9px] text-marathon-light/30 font-heading uppercase tracking-wider">
+
+                {/* Away team shield purely floating */}
+                <div className="flex justify-center flex-1">
+                  <div className="relative w-16 h-16 flex items-center justify-center shrink-0">
+                    <Image
+                      src="/assets/matchday/teams/escudo_olimpia.png"
+                      alt="CD Olimpia"
+                      width={90}
+                      height={90}
+                      className="object-contain filter drop-shadow-[0_4px_12px_rgba(0,0,0,0.3)]"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* General Match Info Row below the container */}
+            <div className="p-4 bg-marathon-darkest/60">
+              {/* Header Details */}
+              <div className="match-card-header flex items-center justify-between mb-3">
+                <span className="text-[15px] font-heading font-bold uppercase  text-marathon-lime">
                   {NEXT_MATCH.competition.split(" - ")[1] || NEXT_MATCH.competition}
                 </span>
-              </div>
-
-              {/* Teams confrontation */}
-              <div className="px-4 py-5">
-                <div className="flex items-center gap-4">
-                  {/* Home team */}
-                  <div className="flex items-center gap-3 flex-1">
-                    <div className="relative w-11 h-11 rounded-xl bg-gradient-to-br from-marathon-green/20 to-marathon-green/5 border border-marathon-green/20 flex items-center justify-center shrink-0 group-hover:border-marathon-lime/40 transition-colors duration-300">
-                      {/* Badge placeholder */}
-                      <span className="text-sm font-heading font-black text-marathon-lime">M</span>
-                      {NEXT_MATCH.isHome && (
-                        <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-marathon-green rounded-full flex items-center justify-center">
-                          <span className="text-[6px] font-black text-white">🏠</span>
-                        </div>
-                      )}
-                    </div>
-                    <div>
-                      <p className="text-sm font-heading font-bold text-marathon-light leading-none">
-                        {NEXT_MATCH.homeTeam}
-                      </p>
-                      {NEXT_MATCH.isHome && (
-                        <p className="text-[8px] text-marathon-lime/60 uppercase tracking-widest mt-0.5">Local</p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* VS pulse */}
-                  <div className="relative shrink-0">
-                    <div className="w-9 h-9 rounded-full border border-marathon-green/20 flex items-center justify-center bg-marathon-darkest/60">
-                      <span className="text-[10px] font-heading font-black text-marathon-lime/70">VS</span>
-                    </div>
-                  </div>
-
-                  {/* Away team */}
-                  <div className="flex items-center gap-3 flex-1 flex-row-reverse">
-                    <div className="relative w-11 h-11 rounded-xl bg-marathon-light/5 border border-marathon-light/10 flex items-center justify-center shrink-0 group-hover:border-marathon-light/20 transition-colors duration-300">
-                      {/* Badge placeholder */}
-                      <span className="text-sm font-heading font-black text-marathon-light/25">O</span>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-heading font-bold text-marathon-light leading-none">
-                        {NEXT_MATCH.awayTeam}
-                      </p>
-                      {!NEXT_MATCH.isHome && (
-                        <p className="text-[8px] text-marathon-light/30 uppercase tracking-widest mt-0.5">Local</p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Bottom info strip */}
-              <div className="flex items-center justify-between px-4 py-2.5 border-t border-marathon-green/10 bg-marathon-green/[0.03]">
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-1 text-marathon-light/40">
-                    <Clock size={10} />
-                    <span className="text-[10px] font-heading font-semibold">{NEXT_MATCH.time}</span>
-                  </div>
-                  <div className="w-px h-3 bg-marathon-green/15" />
-                  <div className="flex items-center gap-1 text-marathon-light/30">
-                    <MapPin size={9} />
-                    <span className="text-[9px]">{NEXT_MATCH.stadium}</span>
-                  </div>
-                </div>
-
-                {/* Days countdown chip */}
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-marathon-green/10 border border-marathon-green/15">
-                  <Zap size={9} className="text-marathon-lime" />
-                  <span className="text-[9px] font-heading font-bold text-marathon-lime">
-                    {daysUntil > 0 ? `${daysUntil}d` : "HOY"}
-                  </span>
-                </div>
-              </div>
-
-              {/* Hover reveal: "Ver más" */}
-              <motion.div
-                className="absolute inset-0 flex items-center justify-center bg-marathon-darkest/60 backdrop-blur-sm rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-              >
-                <span className="flex items-center gap-2 text-sm font-heading font-bold text-marathon-lime">
-                  Ver detalles <ArrowRight size={16} />
+                <span className="text-[13px] font-heading font-bold capitalize text-marathon-light/40">
+                  {formatMatchDate(NEXT_MATCH.date)}
                 </span>
-              </motion.div>
+              </div>
+
+              {/* Bottom details Row */}
+              <div className="match-card-footer flex items-center justify-between border-t border-marathon-green/10 pt-2.5 mt-2.5">
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1 text-marathon-light/40">
+                    <span className="text-[20px] font-bold">{NEXT_MATCH.time}</span>
+                  </div>
+                  <div className="w-px h-2.5 bg-marathon-green/15" />
+                  <div className="flex items-center gap-1 text-marathon-light/35">
+                    <span className="text-[15px] font-heading font-bold">{NEXT_MATCH.stadium}</span>
+                  </div>
+                </div>
+
+
+              </div>
             </div>
+
+            {/* Hover reveal */}
+            <div className="absolute inset-0 flex items-center justify-center bg-marathon-darkest/60 backdrop-blur-sm rounded-[1.75rem] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <span className="flex items-center gap-2 text-sm font-heading font-bold text-marathon-lime">
+                Ver detalles <ArrowRight size={16} />
+              </span>
+            </div>
+
           </div>
         </div>
-      </motion.div>
+      </div>
 
       {/* Scroll indicator */}
-      <motion.div
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.3 }}
-      >
+      <div className="hero-scroll-indicator absolute bottom-6 left-1/2 -translate-x-1/2 z-20">
         <a
           href="#stats"
           className="flex flex-col items-center gap-1 text-marathon-light/30 hover:text-marathon-lime transition-colors"
@@ -266,7 +423,7 @@ export default function HeroSection() {
           <span className="text-[10px] uppercase tracking-widest">Explorar</span>
           <ChevronDown size={18} className="animate-scroll-bounce" />
         </a>
-      </motion.div>
+      </div>
     </section>
   );
 }

@@ -1,13 +1,25 @@
 import type { Metadata } from "next";
-import { outfit, inter, antonio } from "@/lib/fonts";
+import { outfit, inter, antonio, elrotex, elrotexSwash } from "@/lib/fonts";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import SmoothScroll from "@/components/providers/SmoothScroll";
+import Preloader from "@/components/ui/Preloader";
+import ScrollProgress from "@/components/ui/ScrollProgress";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
     default: "Club Deportivo Marathón | Furia Verde — San Pedro Sula, Honduras",
     template: "%s | CD Marathón",
+  },
+  icons: {
+    icon: "/assets/brand/escudocentenario_color.svg",
+    apple: "/assets/brand/escudocentenario_color.svg",
+    shortcut: "/assets/brand/escudocentenario_color.svg",
+    other: {
+      rel: "apple-touch-icon-precomposed",
+      url: "/assets/brand/escudocentenario_color.svg",
+    },
   },
   description:
     "Sitio web oficial del Club Deportivo Marathón, la Furia Verde de San Pedro Sula, Honduras. 9 veces campeón de la Liga Nacional. Fundado en 1925. Soy del verde, soy feliz.",
@@ -51,7 +63,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${outfit.variable} ${inter.variable} ${antonio.variable} h-full antialiased`}
+      className={`${outfit.variable} ${inter.variable} ${antonio.variable} ${elrotex.variable} ${elrotexSwash.variable} h-full antialiased`}
     >
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -59,6 +71,9 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@100..700&display=swap" rel="stylesheet" />
       </head>
       <body className="min-h-full flex flex-col bg-marathon-darkest text-marathon-light">
+        <SmoothScroll />
+        <Preloader />
+        <ScrollProgress />
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />

@@ -1,8 +1,7 @@
 "use client";
 
-import React from "react";
-import { motion } from "framer-motion";
-import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import React, { useRef, useEffect } from "react";
+import { gsap, ScrollTrigger } from "@/hooks/useGsap";
 import { CLUB, SOCIAL_LINKS } from "@/lib/constants";
 import { Send } from "lucide-react";
 import Button from "@/components/ui/Button";
@@ -51,11 +50,91 @@ const socialIcons: Record<string, React.ReactNode> = {
 };
 
 export default function CtaSection() {
-  const { ref, isInView } = useScrollAnimation();
+  const sectionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!sectionRef.current) return;
+
+    const ctx = gsap.context(() => {
+      // ── HEADING ENTRANCE ─────────────────────────────────────
+      gsap.fromTo(
+        ".cta-heading",
+        { opacity: 0, y: 40 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.7,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: ".cta-heading",
+            start: "top 80%",
+            toggleActions: "play none none none",
+          },
+        }
+      );
+
+      // ── SOCIAL LINKS STAGGER ─────────────────────────────────
+      gsap.fromTo(
+        ".cta-social-link",
+        { opacity: 0, y: 30, scale: 0.8 },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.5,
+          stagger: 0.1,
+          ease: "back.out(1.5)",
+          scrollTrigger: {
+            trigger: ".cta-social-row",
+            start: "top 85%",
+            toggleActions: "play none none none",
+          },
+        }
+      );
+
+      // ── NEWSLETTER CARD ──────────────────────────────────────
+      gsap.fromTo(
+        ".cta-newsletter",
+        { opacity: 0, y: 30, scale: 0.96 },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.7,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: ".cta-newsletter",
+            start: "top 85%",
+            toggleActions: "play none none none",
+          },
+        }
+      );
+
+      // ── SLOGAN ───────────────────────────────────────────────
+      gsap.fromTo(
+        ".cta-slogan",
+        { opacity: 0, scale: 0.85 },
+        {
+          opacity: 1,
+          scale: 1,
+          duration: 0.8,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: ".cta-slogan",
+            start: "top 90%",
+            toggleActions: "play none none none",
+          },
+        }
+      );
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
 
   return (
     <section
       id="cta"
+      ref={sectionRef}
       className="relative py-20 md:py-28 overflow-hidden"
     >
       {/* Background gradient */}
@@ -64,63 +143,37 @@ export default function CtaSection() {
       {/* Centered glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-marathon-green/8 rounded-full blur-[150px] pointer-events-none" />
 
-      <div
-        ref={ref}
-        className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center"
-      >
+      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {/* Heading */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-          transition={{ duration: 0.6 }}
-        >
+        <div className="cta-heading">
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-heading font-black text-marathon-light mb-4">
             Únete a la{" "}
             <span className="text-gradient">Furia Verde</span>
           </h2>
           <p className="text-lg text-marathon-light/50 font-body max-w-2xl mx-auto mb-10">
-            Sé parte de la familia marathoniana. Sigue al equipo en redes sociales 
+            Sé parte de la familia marathoniana. Sigue al equipo en redes sociales
             y mantente al día con las últimas noticias, fichajes y resultados.
           </p>
-        </motion.div>
+        </div>
 
         {/* Social Links */}
-        <motion.div
-          className="flex items-center justify-center gap-4 md:gap-6 mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-        >
-          {SOCIAL_LINKS.map((social, index) => (
-            <motion.a
+        <div className="cta-social-row flex items-center justify-center gap-4 md:gap-6 mb-12">
+          {SOCIAL_LINKS.map((social) => (
+            <a
               key={social.name}
               href={social.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-2xl glass-card text-marathon-light/60 hover:text-marathon-lime hover:border-marathon-lime/40 transition-all duration-300"
-              whileHover={{ scale: 1.1, y: -4 }}
-              whileTap={{ scale: 0.95 }}
-              initial={{ opacity: 0, y: 20 }}
-              animate={
-                isInView
-                  ? { opacity: 1, y: 0 }
-                  : { opacity: 0, y: 20 }
-              }
-              transition={{ duration: 0.4, delay: 0.3 + index * 0.1 }}
+              className="cta-social-link w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-2xl glass-card text-marathon-light/60 hover:text-marathon-lime hover:border-marathon-lime/40 hover:scale-110 hover:-translate-y-1 active:scale-95 transition-all duration-300"
               aria-label={social.name}
             >
               {socialIcons[social.icon]}
-            </motion.a>
+            </a>
           ))}
-        </motion.div>
+        </div>
 
         {/* Newsletter */}
-        <motion.div
-          className="glass-card rounded-2xl p-6 md:p-8 max-w-lg mx-auto"
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-        >
+        <div className="cta-newsletter glass-card rounded-2xl p-6 md:p-8 max-w-lg mx-auto">
           <h3 className="text-lg font-heading font-bold text-marathon-light mb-2">
             📬 Newsletter Verdolaga
           </h3>
@@ -142,21 +195,9 @@ export default function CtaSection() {
               Suscribirse
             </Button>
           </form>
-        </motion.div>
+        </div>
 
-        {/* Slogan */}
-        <motion.p
-          className="mt-12 text-2xl md:text-3xl font-heading font-bold text-marathon-lime italic"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={
-            isInView
-              ? { opacity: 1, scale: 1 }
-              : { opacity: 0, scale: 0.9 }
-          }
-          transition={{ duration: 0.6, delay: 0.6 }}
-        >
-          &ldquo;{CLUB.slogan}&rdquo;
-        </motion.p>
+
       </div>
     </section>
   );

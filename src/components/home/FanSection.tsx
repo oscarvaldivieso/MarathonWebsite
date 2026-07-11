@@ -1,14 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import { gsap, ScrollTrigger } from "@/hooks/useGsap";
 import { FAN_QUOTES, CLUB } from "@/lib/constants";
 import { Quote, ChevronLeft, ChevronRight, Heart } from "lucide-react";
 import SectionTitle from "@/components/ui/SectionTitle";
 
 export default function FanSection() {
-  const { ref, isInView } = useScrollAnimation();
+  const sectionRef = useRef<HTMLDivElement>(null);
   const [currentQuote, setCurrentQuote] = useState(0);
 
   const nextQuote = () => {
@@ -21,9 +21,53 @@ export default function FanSection() {
     );
   };
 
+  useEffect(() => {
+    if (!sectionRef.current) return;
+
+    const ctx = gsap.context(() => {
+      // ── QUOTE CARD ENTRANCE ──────────────────────────────────
+      gsap.fromTo(
+        ".fan-card",
+        { opacity: 0, y: 50, scale: 0.95 },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.8,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: ".fan-card",
+            start: "top 80%",
+            toggleActions: "play none none none",
+          },
+        }
+      );
+
+      // ── PASSION STATEMENT ────────────────────────────────────
+      gsap.fromTo(
+        ".fan-passion",
+        { opacity: 0, y: 20 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: ".fan-passion",
+            start: "top 90%",
+            toggleActions: "play none none none",
+          },
+        }
+      );
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
     <section
       id="hinchada"
+      ref={sectionRef}
       className="relative py-20 md:py-28 bg-marathon-darkest overflow-hidden"
     >
       {/* Parallax-like background */}
@@ -42,14 +86,8 @@ export default function FanSection() {
           subtitle="Apasionados, fieles, sufren pero están ahí. Siempre."
         />
 
-        {/* Quotes Carousel */}
-        <motion.div
-          ref={ref}
-          className="relative max-w-3xl mx-auto"
-          initial={{ opacity: 0, y: 40 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
-          transition={{ duration: 0.7 }}
-        >
+        {/* Quotes Carousel — Framer Motion for state-based transitions */}
+        <div className="fan-card relative max-w-3xl mx-auto">
           <div className="glass-card rounded-3xl p-8 md:p-12 text-center min-h-[280px] flex flex-col items-center justify-center">
             {/* Quote Icon */}
             <Quote
@@ -57,7 +95,7 @@ export default function FanSection() {
               className="text-marathon-green/30 mb-6"
             />
 
-            {/* Quote Text */}
+            {/* Quote Text — AnimatePresence for smooth carousel */}
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentQuote}
@@ -111,19 +149,14 @@ export default function FanSection() {
               </button>
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Passion Statement */}
-        <motion.p
-          className="text-center mt-12 text-marathon-light/30 text-sm italic max-w-lg mx-auto"
-          initial={{ opacity: 0 }}
-          animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-        >
+        <p className="fan-passion text-center mt-12 text-marathon-light/30 text-sm italic max-w-lg mx-auto">
           El {CLUB.shortName} no es solo un equipo, es una forma de vida. 
           Es el abrazo de un gol, la lágrima de una derrota y la fe inquebrantable 
           de que siempre habrá un mañana verde.
-        </motion.p>
+        </p>
       </div>
     </section>
   );

@@ -1,4 +1,5 @@
 import { Inter, Outfit, Antonio } from "next/font/google";
+import localFont from "next/font/local";
 
 export const outfit = Outfit({
   subsets: ["latin"],
@@ -19,4 +20,16 @@ export const antonio = Antonio({
   variable: "--font-antonio",
   display: "swap",
   weight: ["400", "700"],
+});
+
+export const elrotex = localFont({
+  src: "../../public/fonts/elrotex.ttf",
+  variable: "--font-elrotex",
+  display: "swap",
+});
+
+export const elrotexSwash = localFont({
+  src: "../../public/fonts/elrotexswash.ttf",
+  variable: "--font-elrotex-swash",
+  display: "swap",
 });
