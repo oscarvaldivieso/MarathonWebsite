@@ -2,7 +2,8 @@
 
 import React, { useEffect, useRef } from "react";
 import { gsap, ScrollTrigger } from "@/hooks/useGsap";
-import { MapPin, Users, Heart } from "lucide-react";
+import { MapPin, Users, Heart, ArrowRight } from "lucide-react";
+import Button from "@/components/ui/Button";
 
 export default function TemploSection() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -70,12 +71,40 @@ export default function TemploSection() {
         0.6
       );
 
-      // Fase 3: Tooltips (Hotspots) trigger fade-in sequential reveal
-      tl.fromTo(
+      // Fase 3: Hotspot cards sequential reveal
+      gsap.fromTo(
         ".hotspot-card",
-        { opacity: 0, scale: 0.7, y: 15 },
-        { opacity: 1, scale: 1, y: 0, stagger: 0.15, duration: 0.5, ease: "back.out(1.8)" },
-        1.4
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          scale: 1,
+          y: 0,
+          stagger: 0.15,
+          duration: 0.5,
+          ease: "back.out(1.8)",
+          scrollTrigger: {
+            trigger: ".hotspot-card",
+            start: "top 90%",
+            toggleActions: "play none none none",
+          },
+        }
+      );
+
+      // CTA button fade-in
+      gsap.fromTo(
+        ".templo-cta",
+        { opacity: 0, y: 20 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: ".templo-cta",
+            start: "top 90%",
+            toggleActions: "play none none none",
+          },
+        }
       );
 
       // Title & Intro text fade out
@@ -303,6 +332,14 @@ export default function TemploSection() {
             </p>
           </div>
 
+        </div>
+
+        {/* CTA */}
+        <div className="templo-cta absolute bottom-20 left-1/2 -translate-x-1/2 z-30 opacity-0">
+          <Button variant="outline" size="lg" href="/estadio">
+            Conoce el Yankel Rosenthal
+            <ArrowRight size={18} />
+          </Button>
         </div>
 
         {/* Downward indicator to guide user */}

@@ -1,11 +1,26 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { gsap, ScrollTrigger } from "@/hooks/useGsap";
+import { motion, AnimatePresence } from "framer-motion";
+import { FAN_QUOTES } from "@/lib/constants";
+import { Quote, ChevronLeft, ChevronRight, Heart, ArrowRight } from "lucide-react";
+import Button from "@/components/ui/Button";
 
 export default function PassionSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
+  const [currentQuote, setCurrentQuote] = useState(0);
+
+  const nextQuote = () => {
+    setCurrentQuote((prev) => (prev + 1) % FAN_QUOTES.length);
+  };
+
+  const prevQuote = () => {
+    setCurrentQuote(
+      (prev) => (prev - 1 + FAN_QUOTES.length) % FAN_QUOTES.length
+    );
+  };
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -81,6 +96,40 @@ export default function PassionSection() {
         0
       );
 
+      // ── QUOTES SECTION ANIMATIONS ────────────────────────────
+      gsap.fromTo(
+        ".passion-quotes-card",
+        { opacity: 0, y: 50, scale: 0.95 },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.8,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: ".passion-quotes-card",
+            start: "top 80%",
+            toggleActions: "play none none none",
+          },
+        }
+      );
+
+      gsap.fromTo(
+        ".passion-cta-block",
+        { opacity: 0, y: 20 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: ".passion-cta-block",
+            start: "top 90%",
+            toggleActions: "play none none none",
+          },
+        }
+      );
+
     }, sectionRef);
 
     return () => {
@@ -91,7 +140,7 @@ export default function PassionSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative min-h-[140vh] w-full bg-marathon-dark py-32 overflow-hidden flex flex-col justify-between z-20"
+      className="relative w-full bg-marathon-dark py-32 overflow-hidden flex flex-col z-20"
       style={{ contentVisibility: "auto" }}
     >
       {/* Absolute watermark text */}
@@ -99,7 +148,7 @@ export default function PassionSection() {
         PASION
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full h-full relative z-10 flex flex-col justify-between flex-1">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full h-full relative z-10 flex flex-col flex-1">
         {/* Asymmetric massive header row */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           <div className="lg:col-span-8">
@@ -278,6 +327,97 @@ export default function PassionSection() {
                 <span className="block text-[10px] text-marathon-light/40 uppercase tracking-wider">Único Monstruo</span>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* ═══════════════════════════════════════════════════════════════
+            LA HINCHADA — Fan Quotes Carousel (Fused from FanSection)
+            ═══════════════════════════════════════════════════════════════ */}
+        <div className="mt-20 pt-16 border-t border-marathon-green/15">
+          {/* Section subtitle */}
+          <div className="text-center mb-12">
+            <span className="text-xs font-heading font-semibold uppercase tracking-[0.3em] text-marathon-lime/70 mb-3 block">
+              Voz del Hincha
+            </span>
+            <h3 className="text-3xl md:text-4xl font-heading font-black text-white">
+              La <span className="text-marathon-lime">Hinchada</span> Habla
+            </h3>
+            <p className="text-marathon-light/40 text-sm mt-2 max-w-lg mx-auto">
+              Apasionados, fieles, sufren pero están ahí. Siempre.
+            </p>
+          </div>
+
+          {/* Quotes Carousel */}
+          <div className="passion-quotes-card relative max-w-3xl mx-auto">
+            <div className="glass-card rounded-3xl p-8 md:p-12 text-center min-h-[280px] flex flex-col items-center justify-center">
+              {/* Quote Icon */}
+              <Quote
+                size={40}
+                className="text-marathon-green/30 mb-6"
+              />
+
+              {/* Quote Text — AnimatePresence for smooth carousel */}
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentQuote}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  <blockquote className="text-xl md:text-2xl lg:text-3xl font-heading font-medium text-marathon-light leading-relaxed mb-6">
+                    &ldquo;{FAN_QUOTES[currentQuote].text}&rdquo;
+                  </blockquote>
+                  <cite className="text-marathon-lime text-sm font-heading not-italic flex items-center justify-center gap-2">
+                    <Heart size={14} className="fill-marathon-lime" />
+                    {FAN_QUOTES[currentQuote].author}
+                  </cite>
+                </motion.div>
+              </AnimatePresence>
+
+              {/* Navigation */}
+              <div className="flex items-center gap-4 mt-8">
+                <button
+                  onClick={prevQuote}
+                  className="w-10 h-10 rounded-full border border-marathon-green/30 flex items-center justify-center text-marathon-light/50 hover:text-marathon-lime hover:border-marathon-lime/50 transition-all duration-300 cursor-pointer"
+                  aria-label="Previous quote"
+                >
+                  <ChevronLeft size={18} />
+                </button>
+
+                {/* Dots */}
+                <div className="flex items-center gap-2">
+                  {FAN_QUOTES.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentQuote(index)}
+                      className={`w-2 h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                        index === currentQuote
+                          ? "bg-marathon-lime w-6"
+                          : "bg-marathon-light/20 hover:bg-marathon-light/40"
+                      }`}
+                      aria-label={`Quote ${index + 1}`}
+                    />
+                  ))}
+                </div>
+
+                <button
+                  onClick={nextQuote}
+                  className="w-10 h-10 rounded-full border border-marathon-green/30 flex items-center justify-center text-marathon-light/50 hover:text-marathon-lime hover:border-marathon-lime/50 transition-all duration-300 cursor-pointer"
+                  aria-label="Next quote"
+                >
+                  <ChevronRight size={18} />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className="passion-cta-block text-center mt-10">
+            <Button variant="outline" size="lg" href="/hinchada">
+              Únete a la hinchada
+              <ArrowRight size={18} />
+            </Button>
           </div>
         </div>
       </div>

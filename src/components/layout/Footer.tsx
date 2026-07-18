@@ -3,6 +3,7 @@
 import React, { useEffect, useRef } from "react";
 import { CLUB, NAV_LINKS, SOCIAL_LINKS } from "@/lib/constants";
 import { Heart } from "lucide-react";
+import SpotlightLogo from "@/components/ui/SpotlightLogo";
 import { gsap, ScrollTrigger } from "@/hooks/useGsap";
 
 // Custom SVG social icons (lucide-react removed brand icons)
@@ -111,12 +112,8 @@ export default function Footer() {
           {/* Brand Column */}
           <div className="lg:col-span-1">
             <div className="flex items-center gap-3 mb-4">
-              <div className="relative w-20 h-20 flex items-center justify-center">
-                <img
-                  src="/assets/brand/escudonormal_blanco.svg"  // Asegúrate de tener el logo en esta ruta
-                  alt="CD Marathon"
-                  className="w-50 h-50 object-contain"
-                />
+              <div className="relative w-24 h-24 flex items-center justify-center -ml-2">
+                <SpotlightLogo size={96} />
               </div>
               <div>
                 <p className="font-heading font-bold text-marathon-light text-sm">

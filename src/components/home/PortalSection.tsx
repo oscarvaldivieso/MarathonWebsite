@@ -117,24 +117,14 @@ export default function PortalSection() {
     if (isLoaded) {
       const gsapCtx = gsap.context(() => {
         const frameObj = { frame: 1 };
+        let frameTween: gsap.core.Tween | null = null;
 
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: container,
-            start: "top top",
-            end: "bottom bottom",
-            scrub: 0.5,
-            pin: pinRef.current,
-            anticipatePin: 1,
-          },
-        });
-
-        // 1. Play the monster animation frames sequentially (0% to 65% scroll progress)
-        tl.to(
-          frameObj,
-          {
+        const playMonsterAnimation = () => {
+          if (frameTween) frameTween.kill();
+          frameTween = gsap.to(frameObj, {
             frame: TOTAL_FRAMES,
-            ease: "none",
+            duration: 1.4, // Cycles all 99 frames over 1.4 seconds at maximum screen refresh rate
+            ease: "power2.out",
             onUpdate: () => {
               const targetFrame = Math.round(frameObj.frame);
               if (targetFrame !== currentFrameRef.current) {
@@ -142,9 +132,27 @@ export default function PortalSection() {
                 drawFrame(targetFrame);
               }
             },
+          });
+        };
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: container,
+            start: "top top",
+            end: "bottom bottom",
+            scrub: 1.2,
+            pin: pinRef.current,
+            anticipatePin: 1,
+            onEnter: playMonsterAnimation,
+            onEnterBack: playMonsterAnimation,
+            onLeaveBack: () => {
+              if (frameTween) frameTween.kill();
+              frameObj.frame = 1;
+              currentFrameRef.current = 1;
+              drawFrame(1);
+            },
           },
-          0
-        );
+        });
 
         // 2. Trigger Claw Scratch CSS clipPath reveal (triggers at 22% scroll progress)
         tl.fromTo(
@@ -179,12 +187,31 @@ export default function PortalSection() {
 
         // 6. Perform massive cinematic zoom targeting the mouth cavity (50% to 100% scroll progress)
         // Mouth coordinate is precisely aligned around X:50% and Y:63%
+        // Max scale reduced from 28 to 15 to prevent pixelation, paired with a longer fade transition
         tl.fromTo(
           ".portal-canvas-wrapper",
           { scale: 0.85, transformOrigin: "50% 63%", y: 40 },
-          { scale: 28, transformOrigin: "50% 63%", y: 0, ease: "power2.in" },
+          { scale: 15, transformOrigin: "50% 63%", y: 0, ease: "power2.in" },
           0.45
         );
+
+        // 6b. Cinematic Screen Shake / Rumble during the zoom (simulating seismic impact)
+        const shakeTimings = [0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.84];
+        shakeTimings.forEach((time, index) => {
+          const intensity = 8 * (1 - index / shakeTimings.length); // Decelerating shake magnitude
+          tl.to(
+            ".portal-canvas-wrapper",
+            {
+              x: (Math.random() - 0.5) * intensity,
+              y: (Math.random() - 0.5) * intensity,
+              duration: 0.05,
+              ease: "none",
+            },
+            time
+          );
+        });
+        // Reset coordinate alignment
+        tl.to(".portal-canvas-wrapper", { x: 0, y: 0, duration: 0.04 }, 0.88);
 
         // 7. Tighten the radial vignette in sync with zoom to create heavy focus/shadow
         tl.fromTo(
@@ -214,19 +241,19 @@ export default function PortalSection() {
           0.05
         );
 
-        // 10. Smoothly fade the entire section background to absolute pitch black
+        // 10. Smoothly fade the entire section background to absolute pitch black earlier
         tl.to(
           container,
-          { backgroundColor: "#000000", duration: 0.5 },
-          0.3
+          { backgroundColor: "#000000", duration: 0.4 },
+          0.08
         );
 
-        // 11. Dynamic black-out overlay at the final 10% scroll for a seamless dark transition
+        // 11. Dynamic black-out overlay with a longer duration for a premium seamless dark transition
         tl.fromTo(
           ".portal-black-fade",
           { opacity: 0 },
-          { opacity: 1, duration: 0.15, ease: "power1.in" },
-          0.85
+          { opacity: 1, duration: 0.22, ease: "power1.in" },
+          0.78
         );
 
       }, containerRef);
@@ -247,7 +274,7 @@ export default function PortalSection() {
     <div
       ref={containerRef}
       className="relative w-full bg-marathon-darkest z-30 transition-colors duration-700"
-      style={{ height: "240vh" }}
+      style={{ height: "300vh" }}
     >
       <div
         ref={pinRef}

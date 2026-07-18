@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { gsap } from "gsap";
+import SpotlightLogo from "@/components/ui/SpotlightLogo";
 
 export default function Preloader() {
   const [isLoading, setIsLoading] = useState(true);
@@ -92,12 +93,8 @@ export default function Preloader() {
 
       <div className="preloader-content relative flex flex-col items-center gap-6">
         {/* Logo */}
-        <div ref={logoRef} className="w-20 h-20 md:w-24 md:h-24">
-          <img
-            src="/assets/brand/escudonormal_blanco.svg"
-            alt="CD Marathón"
-            className="w-full h-full object-contain"
-          />
+        <div ref={logoRef} className="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center">
+          <SpotlightLogo size={112} />
         </div>
 
         {/* Text */}
