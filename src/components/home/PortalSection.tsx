@@ -381,6 +381,9 @@ export default function PortalSection() {
           <div className="w-[1px] h-10 bg-gradient-to-b from-marathon-lime to-transparent animate-pulse" />
         </div>
 
+        {/* Neon green flash overlay triggered on claw swipe */}
+        <div className="portal-flash absolute inset-0 bg-marathon-lime pointer-events-none opacity-0 z-30 mix-blend-color-dodge" />
+
         {/* Fail-safe full black transition overlay */}
         <div className="portal-black-fade absolute inset-0 bg-black pointer-events-none opacity-0 z-40" />
       </div>

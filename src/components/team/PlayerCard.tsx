@@ -152,7 +152,7 @@ export default function PlayerCard({ player, onClick }: PlayerCardProps) {
 
         {/* Bottom Details - Name and quick stats */}
         <div className="relative mt-auto">
-          <h3 className="text-xl font-elrotex font-black text-marathon-light tracking-wider truncate transition-colors duration-300 uppercase group-hover:text-marathon-lime">
+          <h3 className="text-xl font-elrotex text-marathon-light tracking-wider truncate transition-colors duration-300 uppercase group-hover:text-marathon-lime">
             {player.name}
           </h3>
           <p className="text-[11px] font-body text-marathon-light/50 tracking-wider">

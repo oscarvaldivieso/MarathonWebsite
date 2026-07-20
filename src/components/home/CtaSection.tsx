@@ -109,23 +109,6 @@ export default function CtaSection() {
           },
         }
       );
-
-      // ── SLOGAN ───────────────────────────────────────────────
-      gsap.fromTo(
-        ".cta-slogan",
-        { opacity: 0, scale: 0.85 },
-        {
-          opacity: 1,
-          scale: 1,
-          duration: 0.8,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: ".cta-slogan",
-            start: "top 90%",
-            toggleActions: "play none none none",
-          },
-        }
-      );
     }, sectionRef);
 
     return () => ctx.revert();
