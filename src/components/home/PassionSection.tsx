@@ -2,14 +2,40 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { gsap, ScrollTrigger } from "@/hooks/useGsap";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { FAN_QUOTES } from "@/lib/constants";
 import { Quote, ChevronLeft, ChevronRight, Heart, ArrowRight } from "lucide-react";
 import Button from "@/components/ui/Button";
 
+const SLIDES = [
+  {
+    category: "Orígenes y Cuna",
+    title: "1925: Nace la Furia Verde",
+    text: "Fundado el 25 de noviembre de 1925 en el corazón de San Pedro Sula. Nace una leyenda de lucha, carácter y fidelidad incondicional, forjando el mito del único Monstruo Verde de Centroamérica.",
+    image: "/assets/history/historic_1925.png"
+  },
+  {
+    category: "Valores y Honor",
+    title: "El Alma Blanca de la Costa",
+    text: "El color blanco representa el honor en el campo de batalla deportivo y la hermandad de una familia que comparte un mismo latido. Un club que compite con hidalguía pero defiende con orgullo cada palmo de su historia.",
+    image: "/assets/stadium/celebration.png"
+  },
+  {
+    category: "Sangre y Fuego",
+    title: "La Pasión Roja del Yankel",
+    text: "El rojo simboliza la sangre y el fuego de la afición más apasionada de Honduras. Las banderas ondean y el Yankel Rosenthal ruge en cada jornada, demostrando que este sentimiento verdolaga es inmortal.",
+    image: "/assets/fans/stadium_passion.png"
+  }
+];
+
 export default function PassionSection() {
   const sectionRef = useRef<HTMLElement>(null);
-  const svgRef = useRef<SVGSVGElement>(null);
+  const greenPathRef = useRef<SVGPathElement>(null);
+  const whitePathRef = useRef<SVGPathElement>(null);
+  const redPathRef = useRef<SVGPathElement>(null);
+  const greenGlowRef = useRef<SVGPathElement>(null);
+  const redGlowRef = useRef<SVGPathElement>(null);
+
   const [currentQuote, setCurrentQuote] = useState(0);
 
   const nextQuote = () => {
@@ -23,111 +49,89 @@ export default function PassionSection() {
   };
 
   useEffect(() => {
-    const section = sectionRef.current;
-    if (!section) return;
+    const paths = [
+      greenPathRef.current,
+      whitePathRef.current,
+      redPathRef.current,
+      greenGlowRef.current,
+      redGlowRef.current
+    ];
+
+    // Filter out null elements
+    const activePaths = paths.filter((p): p is SVGPathElement => p !== null);
+    if (activePaths.length === 0) return;
 
     const ctx = gsap.context(() => {
-      // 1. Prepare SVG paths for drawing (Calculate lengths dynamically)
-      const drawPaths = section.querySelectorAll(".draw-path");
-      drawPaths.forEach((path) => {
-        const length = (path as SVGPathElement).getTotalLength();
+      // Set initial dasharray & dashoffset based on total length for each path
+      activePaths.forEach((path) => {
+        const pathLength = path.getTotalLength();
         gsap.set(path, {
-          strokeDasharray: length,
-          strokeDashoffset: length,
-          opacity: 1
+          strokeDasharray: pathLength,
+          strokeDashoffset: pathLength
         });
       });
 
-      // 2. Main Scroll-driven timeline
+      // Master Scroll-driven timeline coordinating path drawing and content reveals
       const tl = gsap.timeline({
         scrollTrigger: {
-          trigger: section,
-          start: "top 75%",
-          end: "bottom 20%",
-          scrub: 1,
+          trigger: ".spotlight",
+          start: "top 35%",
+          end: "bottom 85%",
+          scrub: 1.2,
+          invalidateOnRefresh: true,
         },
       });
 
-      // Draw vector lines sequentially
-      tl.to(
-        drawPaths,
-        {
-          strokeDashoffset: 0,
-          stagger: 0.12,
-          ease: "power1.inOut",
-        },
-        0
+      // 1. Draw SVG paths continuously from 0% to 100% of scroll timeline
+      tl.to(activePaths, {
+        strokeDashoffset: 0,
+        ease: "none",
+        duration: 1
+      }, 0);
+
+      // 2. Coreographed Reveals based on scroll progress of the drawing path (total duration: 1)
+      
+      // Row 1 (Origins Centered Image) - appears at 8% progress
+      tl.fromTo(".row-1-img",
+        { opacity: 0, scale: 0.85, y: 40 },
+        { opacity: 1, scale: 1, y: 0, duration: 0.15, ease: "back.out(1.5)" },
+        0.08
       );
 
-      // Smoothly fill color blocks at 45% scroll progress
-      tl.to(
-        ".fill-shape",
-        {
-          opacity: 0.18,
-          scale: 1.02,
-          stagger: 0.08,
-          duration: 0.5,
-          ease: "power2.out",
-        },
-        0.4
+      // Row 2 (Origins Card left, Celebration Image right) - appears at 28% progress
+      tl.fromTo(".row-2-card",
+        { opacity: 0, x: -60 },
+        { opacity: 1, x: 0, duration: 0.18, ease: "power2.out" },
+        0.28
+      );
+      tl.fromTo(".row-2-img",
+        { opacity: 0, x: 60, scale: 0.95 },
+        { opacity: 1, x: 0, scale: 1, duration: 0.18, ease: "power2.out" },
+        0.30
       );
 
-      // Fade-in flag crest centerpiece
-      tl.fromTo(
-        ".passion-crest",
-        { scale: 0.9, opacity: 0 },
-        { scale: 1, opacity: 0.25, duration: 0.6, ease: "back.out(1.5)" },
-        0.5
+      // Row 3 (Fans Image left, Identity Card right) - appears at 58% progress
+      tl.fromTo(".row-3-img",
+        { opacity: 0, x: -60, scale: 0.95 },
+        { opacity: 1, x: 0, scale: 1, duration: 0.18, ease: "power2.out" },
+        0.58
+      );
+      tl.fromTo(".row-3-card",
+        { opacity: 0, x: 60 },
+        { opacity: 1, x: 0, duration: 0.18, ease: "power2.out" },
+        0.60
       );
 
-      // Line-by-line reveal for typography (Split Text simulation)
-      tl.fromTo(
-        ".split-line",
-        { y: "110%", opacity: 0 },
-        { y: "0%", opacity: 1, stagger: 0.08, duration: 0.6, ease: "power3.out" },
-        0.3
+      // Row 4 (Passion Card left, Heart Box right) - appears at 82% progress
+      tl.fromTo(".row-4-card",
+        { opacity: 0, y: 40 },
+        { opacity: 1, y: 0, duration: 0.18, ease: "power2.out" },
+        0.82
       );
-
-      // Scale down background watermark text
-      tl.fromTo(
-        ".passion-watermark",
-        { xPercent: 10, opacity: 0 },
-        { xPercent: -5, opacity: 0.02, duration: 1.2, ease: "none" },
-        0
-      );
-
-      // ── QUOTES SECTION ANIMATIONS ────────────────────────────
-      gsap.fromTo(
-        ".passion-quotes-card",
-        { opacity: 0, y: 50, scale: 0.95 },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.8,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: ".passion-quotes-card",
-            start: "top 80%",
-            toggleActions: "play none none none",
-          },
-        }
-      );
-
-      gsap.fromTo(
-        ".passion-cta-block",
-        { opacity: 0, y: 20 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.6,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: ".passion-cta-block",
-            start: "top 90%",
-            toggleActions: "play none none none",
-          },
-        }
+      tl.fromTo(".row-4-decor",
+        { opacity: 0, scale: 0.75, rotate: -5 },
+        { opacity: 1, scale: 1, rotate: 0, duration: 0.18, ease: "back.out(1.8)" },
+        0.85
       );
 
     }, sectionRef);
@@ -140,305 +144,271 @@ export default function PassionSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full bg-marathon-dark py-32 overflow-hidden flex flex-col z-20"
-      style={{ contentVisibility: "auto" }}
+      className="relative w-full bg-marathon-darkest py-24 overflow-hidden flex flex-col z-20"
     >
-      {/* Absolute watermark text */}
-      <div className="passion-watermark absolute right-0 top-1/4 text-[25vw] font-bold text-white select-none pointer-events-none tracking-tighter whitespace-nowrap opacity-0 font-elrotex will-change-transform z-0">
+      {/* Absolute background watermark text */}
+      <div className="absolute right-0 top-[12%] text-[20vw] font-bold text-white/[0.01] select-none pointer-events-none tracking-tighter whitespace-nowrap font-elrotex z-0">
         PASION
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full h-full relative z-10 flex flex-col flex-1">
-        {/* Asymmetric massive header row */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          <div className="lg:col-span-8">
-            <h2 className="text-[12vw] tracking-[0.10em] sm:text-[8vw] lg:text-[7.5rem] text-white leading-none font-elrotex select-none uppercase">
-              <span className="block text-marathon-lime">BANDERA DE</span>
-              <span className="block text-white/90">NUESTRA PASION</span>
-            </h2>
-          </div>
-
-          <div className="lg:col-span-4 lg:pt-12 text-right">
-            <span className="inline-block text-[15px] font-heading font-bold text-marathon-lime tracking-[0.3em] uppercase border-r-2 border-marathon-lime pr-4 mb-2">
-              DESDE 1925
-            </span>
-            <p className="text-marathon-light/50 text-xs tracking-widest uppercase">
-              San Pedro Sula • Honduras
-            </p>
-          </div>
-        </div>
-
-        {/* Dynamic Vector Canvas & Text Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center my-16">
-          {/* Left: Interactive SVGs (Waving Banner representation) */}
-          <div className="lg:col-span-7 flex justify-center items-center relative min-h-[400px]">
-            {/* Ambient glows behind vectors */}
-            <div className="absolute inset-0 bg-marathon-green/10 rounded-full blur-[80px] opacity-40 pointer-events-none scale-75 animate-pulse" />
-
-            <svg
-              ref={svgRef}
-              viewBox="0 0 800 500"
-              className="w-full max-w-[650px] aspect-[8/5] overflow-visible waving-flag select-none pointer-events-none will-change-transform"
-              style={{
-                transformStyle: "preserve-3d"
-              }}
-            >
-              {/* Group applying waves to colored shapes */}
-              <g>
-                {/* FLAG SHAPE 1 (Green Top Block) */}
-                <path
-                  className="fill-shape transition-transform duration-700"
-                  d="M 50,100 C 200,60 300,140 450,100 C 600,60 700,120 750,110 L 750,210 C 700,220 600,160 450,200 C 300,240 200,160 50,200 Z"
-                  fill="#2E9C3F"
-                  opacity="0"
-                  style={{ transformOrigin: "center" }}
-                />
-
-                {/* FLAG SHAPE 2 (White Middle Block) */}
-                <path
-                  className="fill-shape transition-transform duration-700"
-                  d="M 50,200 C 200,160 300,240 450,200 C 600,160 700,220 750,210 L 750,310 C 700,320 600,260 450,300 C 300,340 200,260 50,300 Z"
-                  fill="#F3F3F3"
-                  opacity="0"
-                  style={{ transformOrigin: "center" }}
-                />
-
-                {/* FLAG SHAPE 3 (Lime Bottom Block) */}
-                <path
-                  className="fill-shape transition-transform duration-700"
-                  d="M 50,300 C 200,260 300,340 450,300 C 600,260 700,320 750,310 L 750,410 C 700,420 600,360 450,400 C 300,440 200,360 50,400 Z"
-                  fill="#92BF4E"
-                  opacity="0"
-                  style={{ transformOrigin: "center" }}
-                />
-
-                {/* DRAWN OUTLINE VECTORS */}
-                {/* Top Contour Line */}
-                <path
-                  className="draw-path"
-                  d="M 50,100 C 200,60 300,140 450,100 C 600,60 700,120 750,110"
-                  fill="none"
-                  stroke="#92BF4E"
-                  strokeWidth="4"
-                  strokeLinecap="round"
-                  opacity="0"
-                />
-
-                {/* Stripe 1 Splitter */}
-                <path
-                  className="draw-path"
-                  d="M 50,200 C 200,160 300,240 450,200 C 600,160 700,220 750,210"
-                  fill="none"
-                  stroke="#F3F3F3"
-                  strokeWidth="3.5"
-                  strokeLinecap="round"
-                  opacity="0"
-                />
-
-                {/* Stripe 2 Splitter */}
-                <path
-                  className="draw-path"
-                  d="M 50,300 C 200,260 300,340 450,300 C 600,260 700,320 750,310"
-                  fill="none"
-                  stroke="#2E9C3F"
-                  strokeWidth="3.5"
-                  strokeLinecap="round"
-                  opacity="0"
-                />
-
-                {/* Bottom Contour Line */}
-                <path
-                  className="draw-path"
-                  d="M 50,400 C 200,360 300,440 450,400 C 600,360 700,420 750,410"
-                  fill="none"
-                  stroke="#92BF4E"
-                  strokeWidth="4"
-                  strokeLinecap="round"
-                  opacity="0"
-                />
-
-                {/* Flag Staff Pole */}
-                <path
-                  className="draw-path"
-                  d="M 50,60 L 50,460"
-                  fill="none"
-                  stroke="#F3F3F3"
-                  strokeWidth="6"
-                  strokeLinecap="round"
-                  opacity="0"
-                />
-              </g>
-
-              {/* Club Emblem Overlay in Center of flag */}
-              <image
-                className="passion-crest opacity-0"
-                href="/assets/brand/escudo_normal.svg"
-                x="330"
-                y="180"
-                width="140"
-                height="140"
-                style={{
-                  transformOrigin: "400px 250px"
-                }}
-              />
-            </svg>
-          </div>
-
-          {/* Right: Narrative Poppins Text Blocks */}
-          <div className="lg:col-span-5 flex flex-col justify-center space-y-8 lg:pl-6">
-            <div className="space-y-4">
-              <div className="overflow-hidden">
-                <h4 className="split-line text-xs font-bold tracking-[0.25em] text-marathon-lime uppercase block">
-                  Identidad Inquebrantable
-                </h4>
-              </div>
-              <div className="overflow-hidden">
-                <h3 className="split-line text-2xl md:text-3xl font-heading font-bold text-white block leading-tight">
-                  Trazados de Gloria sobre el Lienzo Verde
-                </h3>
-              </div>
-            </div>
-
-            <div className="space-y-6 text-marathon-light/75 text-sm md:text-base leading-relaxed font-sans font-normal">
-              <div className="overflow-hidden">
-                <p className="split-line block">
-                  El verde no es solo un color en nuestro escudo, es la representación viva de la costa norte, de la furia de nuestra gente y de la historia de los pioneros de 1925.
-                </p>
-              </div>
-              <div className="overflow-hidden">
-                <p className="split-line block">
-                  A través de las décadas, cada hilo de nuestra bandera ha ondeado con el rugido de la afición más apasionada de Honduras. Un sentimiento inmortal que nace en San Pedro Sula y se expande por todo el territorio nacional.
-                </p>
-              </div>
-            </div>
-
-            {/* Micro details stats row */}
-            <div className="grid grid-cols-3 gap-4 pt-6 border-t border-marathon-green/20">
-              <div>
-                <span className="block text-2xl font-heading font-bold text-white">99+</span>
-                <span className="block text-[10px] text-marathon-light/40 uppercase tracking-wider">Años de Lucha</span>
-              </div>
-              <div>
-                <span className="block text-2xl font-heading font-bold text-marathon-lime">9</span>
-                <span className="block text-[10px] text-marathon-light/40 uppercase tracking-wider">Títulos Liga</span>
-              </div>
-              <div>
-                <span className="block text-2xl font-heading font-bold text-white">1</span>
-                <span className="block text-[10px] text-marathon-light/40 uppercase tracking-wider">Único Monstruo</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* ═══════════════════════════════════════════════════════════════
-            LA HINCHADA — Fan Quotes Carousel (Fused from FanSection)
-            ═══════════════════════════════════════════════════════════════ */}
-        <div className="mt-20 pt-16 border-t border-marathon-green/15">
-          {/* Section subtitle */}
-          <div className="text-center mb-12">
-            <span className="text-xs font-heading font-semibold uppercase tracking-[0.3em] text-marathon-lime/70 mb-3 block">
-              Voz del Hincha
-            </span>
-            <h3 className="text-3xl md:text-4xl font-heading font-black text-white">
-              La <span className="text-marathon-lime">Hinchada</span> Habla
-            </h3>
-            <p className="text-marathon-light/40 text-sm mt-2 max-w-lg mx-auto">
-              Apasionados, fieles, sufren pero están ahí. Siempre.
-            </p>
-          </div>
-
-          {/* Quotes Carousel */}
-          <div className="passion-quotes-card relative max-w-3xl mx-auto">
-            <div className="glass-card rounded-3xl p-8 md:p-12 text-center min-h-[280px] flex flex-col items-center justify-center">
-              {/* Quote Icon */}
-              <Quote
-                size={40}
-                className="text-marathon-green/30 mb-6"
-              />
-
-              {/* Quote Text — AnimatePresence for smooth carousel */}
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={currentQuote}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.4 }}
-                >
-                  <blockquote className="text-xl md:text-2xl lg:text-3xl font-heading font-medium text-marathon-light leading-relaxed mb-6">
-                    &ldquo;{FAN_QUOTES[currentQuote].text}&rdquo;
-                  </blockquote>
-                  <cite className="text-marathon-lime text-sm font-heading not-italic flex items-center justify-center gap-2">
-                    <Heart size={14} className="fill-marathon-lime" />
-                    {FAN_QUOTES[currentQuote].author}
-                  </cite>
-                </motion.div>
-              </AnimatePresence>
-
-              {/* Navigation */}
-              <div className="flex items-center gap-4 mt-8">
-                <button
-                  onClick={prevQuote}
-                  className="w-10 h-10 rounded-full border border-marathon-green/30 flex items-center justify-center text-marathon-light/50 hover:text-marathon-lime hover:border-marathon-lime/50 transition-all duration-300 cursor-pointer"
-                  aria-label="Previous quote"
-                >
-                  <ChevronLeft size={18} />
-                </button>
-
-                {/* Dots */}
-                <div className="flex items-center gap-2">
-                  {FAN_QUOTES.map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setCurrentQuote(index)}
-                      className={`w-2 h-2 rounded-full transition-all duration-300 cursor-pointer ${
-                        index === currentQuote
-                          ? "bg-marathon-lime w-6"
-                          : "bg-marathon-light/20 hover:bg-marathon-light/40"
-                      }`}
-                      aria-label={`Quote ${index + 1}`}
-                    />
-                  ))}
-                </div>
-
-                <button
-                  onClick={nextQuote}
-                  className="w-10 h-10 rounded-full border border-marathon-green/30 flex items-center justify-center text-marathon-light/50 hover:text-marathon-lime hover:border-marathon-lime/50 transition-all duration-300 cursor-pointer"
-                  aria-label="Next quote"
-                >
-                  <ChevronRight size={18} />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* CTA */}
-          <div className="passion-cta-block text-center mt-10">
-            <Button variant="outline" size="lg" href="/hinchada">
-              Únete a la hinchada
-              <ArrowRight size={18} />
-            </Button>
-          </div>
-        </div>
+      {/* Header block */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-8 pb-12 relative z-10">
+        <span className="inline-block text-[14px] font-heading font-semibold text-marathon-lime tracking-[0.3em] uppercase border-b border-marathon-lime/30 pb-2 mb-4">
+          DESDE 1925
+        </span>
+        <h2 className="text-4xl sm:text-6xl lg:text-7xl font-heading font-black text-white leading-none uppercase">
+          BANDERA DE NUESTRA <span className="text-gradient">PASIÓN</span>
+        </h2>
+        <p className="text-marathon-light/45 text-xs mt-3 tracking-widest uppercase">
+          San Pedro Sula • Honduras
+        </p>
       </div>
 
-      {/* Styled Inline waving flag animation */}
-      <style jsx global>{`
-        @keyframes flag-wave {
-          0% {
-            transform: translateY(0) scaleY(1);
-          }
-          50% {
-            transform: translateY(-6px) scaleY(1.02) skewX(1deg);
-          }
-          100% {
-            transform: translateY(0) scaleY(1);
-          }
-        }
-        .waving-flag {
-          animation: flag-wave 5s ease-in-out infinite;
-        }
-      `}</style>
+      {/* ── SPOTLIGHT CONTAINER (Wavy SVG drawing path) ─────────────────── */}
+      <div className="spotlight relative w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 flex flex-col gap-32 md:gap-44 overflow-visible z-10">
+        
+        {/* Fila 1 (Imagen Histórica Centrada) */}
+        <div className="row flex justify-center items-center">
+          <div className="row-1-img img-wrapper w-full max-w-[650px] aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border border-white/10 filter drop-shadow-[0_15px_30px_rgba(14,114,29,0.25)] opacity-0 will-change-transform">
+            <img 
+              src={SLIDES[0].image} 
+              alt="Club Deportivo Marathón 1925" 
+              className="w-full h-full object-cover select-none pointer-events-none"
+            />
+          </div>
+        </div>
+
+        {/* Fila 2 (Tarjeta 1 a la izquierda, Imagen 2 a la derecha) */}
+        <div className="row grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center">
+          <div className="col flex flex-col justify-center">
+            <div className="row-2-card card-box glass-card p-6 md:p-10 rounded-3xl border border-white/10 shadow-2xl space-y-4 max-w-[500px] mx-auto md:mr-0 opacity-0 will-change-transform">
+              <span className="text-marathon-lime font-bold tracking-[0.25em] text-xs uppercase block">
+                {SLIDES[0].category}
+              </span>
+              <h3 className="text-2xl md:text-3xl font-heading font-black text-white leading-tight uppercase">
+                {SLIDES[0].title}
+              </h3>
+              <p className="text-marathon-light/80 font-body text-sm md:text-base leading-relaxed">
+                {SLIDES[0].text}
+              </p>
+            </div>
+          </div>
+          <div className="col flex justify-center">
+            <div className="row-2-img img-wrapper w-full max-w-[480px] aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border border-white/10 filter drop-shadow-[0_15px_30px_rgba(255,255,255,0.15)] opacity-0 will-change-transform">
+              <img 
+                src={SLIDES[1].image} 
+                alt="Celebración Plantel de Marathón" 
+                className="w-full h-full object-cover select-none pointer-events-none"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Fila 3 (Imagen 3 a la izquierda, Tarjeta 2 a la derecha) */}
+        <div className="row grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center">
+          <div className="col flex justify-center md:order-1 order-2">
+            <div className="row-3-img img-wrapper w-full max-w-[480px] aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border border-white/10 filter drop-shadow-[0_15px_30px_rgba(217,33,33,0.25)] opacity-0 will-change-transform">
+              <img 
+                src={SLIDES[2].image} 
+                alt="Hinchada Verdolaga en el Yankel" 
+                className="w-full h-full object-cover select-none pointer-events-none"
+              />
+            </div>
+          </div>
+          <div className="col flex flex-col justify-center md:order-2 order-1">
+            <div className="row-3-card card-box glass-card p-6 md:p-10 rounded-3xl border border-white/10 shadow-2xl space-y-4 max-w-[500px] mx-auto md:ml-0 opacity-0 will-change-transform">
+              <span className="text-marathon-lime font-bold tracking-[0.25em] text-xs uppercase block">
+                {SLIDES[1].category}
+              </span>
+              <h3 className="text-2xl md:text-3xl font-heading font-black text-white leading-tight uppercase">
+                {SLIDES[1].title}
+              </h3>
+              <p className="text-marathon-light/80 font-body text-sm md:text-base leading-relaxed">
+                {SLIDES[1].text}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Fila 4 (Tarjeta 3 a la izquierda, detalle a la derecha) */}
+        <div className="row grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center">
+          <div className="col flex flex-col justify-center">
+            <div className="row-4-card card-box glass-card p-6 md:p-10 rounded-3xl border border-white/10 shadow-2xl space-y-4 max-w-[500px] mx-auto md:mr-0 opacity-0 will-change-transform">
+              <span className="text-marathon-lime font-bold tracking-[0.25em] text-xs uppercase block">
+                {SLIDES[2].category}
+              </span>
+              <h3 className="text-2xl md:text-3xl font-heading font-black text-white leading-tight uppercase">
+                {SLIDES[2].title}
+              </h3>
+              <p className="text-marathon-light/80 font-body text-sm md:text-base leading-relaxed">
+                {SLIDES[2].text}
+              </p>
+            </div>
+          </div>
+          <div className="col flex justify-center items-center">
+            <div className="row-4-decor relative text-center p-8 border border-marathon-green/20 rounded-3xl bg-marathon-green/5 max-w-[360px] shadow-lg backdrop-blur-sm opacity-0 will-change-transform">
+              <Heart size={36} className="text-marathon-lime mx-auto mb-4 animate-pulse fill-marathon-lime" />
+              <h4 className="text-lg font-heading font-bold text-white mb-2 uppercase">Un sentimiento inmortal</h4>
+              <p className="text-xs text-marathon-light/60 leading-relaxed">
+                Cruzando generaciones desde 1925, latiendo más fuerte que nunca en la costa norte de Honduras.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Contenedor del trazo SVG de fondo animado (3 SVGs unidos armando la bandera tricolor real) */}
+        <div className="svg-path absolute top-[3%] bottom-[3%] left-1/2 -translate-x-1/2 w-[90%] md:w-[94%] z-0 pointer-events-none">
+          <svg
+            viewBox="0 0 1378 2760"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            preserveAspectRatio="none"
+            className="w-full h-full"
+          >
+            {/* 1. Franja Verde (Izquierda) */}
+            <path
+              ref={greenPathRef}
+              d="M639.668 100C639.668 100 105.669 100 199.669 601.503C293.669 1103.01 1277.17 691.502 1277.17 1399.5C1277.17 2107.5 -155.332 1968 140.168 1438.5C435.669 909.002 1442.66 2093.5 713.168 2659.5"
+              stroke="#0e721d"
+              strokeWidth="56"
+              strokeLinecap="round"
+              transform="translate(-52, 0)"
+              className="opacity-90"
+            />
+            {/* 2. Franja Blanca (Centro) */}
+            <path
+              ref={whitePathRef}
+              d="M639.668 100C639.668 100 105.669 100 199.669 601.503C293.669 1103.01 1277.17 691.502 1277.17 1399.5C1277.17 2107.5 -155.332 1968 140.168 1438.5C435.669 909.002 1442.66 2093.5 713.168 2659.5"
+              stroke="#FFFFFF"
+              strokeWidth="56"
+              strokeLinecap="round"
+              className="opacity-95"
+            />
+            {/* 3. Franja Roja (Derecha) */}
+            <path
+              ref={redPathRef}
+              d="M639.668 100C639.668 100 105.669 100 199.669 601.503C293.669 1103.01 1277.17 691.502 1277.17 1399.5C1277.17 2107.5 -155.332 1968 140.168 1438.5C435.669 909.002 1442.66 2093.5 713.168 2659.5"
+              stroke="#d92121"
+              strokeWidth="56"
+              strokeLinecap="round"
+              transform="translate(52, 0)"
+              className="opacity-90"
+            />
+
+            {/* Bordes de Luz / Brillo Neon Creativos */}
+            {/* Brillo Extremo Izquierdo (Verde Limón) */}
+            <path
+              ref={greenGlowRef}
+              d="M639.668 100C639.668 100 105.669 100 199.669 601.503C293.669 1103.01 1277.17 691.502 1277.17 1399.5C1277.17 2107.5 -155.332 1968 140.168 1438.5C435.669 909.002 1442.66 2093.5 713.168 2659.5"
+              stroke="#92BF4E"
+              strokeWidth="5"
+              strokeLinecap="round"
+              transform="translate(-80, 0)"
+              className="opacity-60 filter drop-shadow-[0_0_8px_#92BF4E]"
+            />
+            {/* Brillo Extremo Derecho (Rojo Neon) */}
+            <path
+              ref={redGlowRef}
+              d="M639.668 100C639.668 100 105.669 100 199.669 601.503C293.669 1103.01 1277.17 691.502 1277.17 1399.5C1277.17 2107.5 -155.332 1968 140.168 1438.5C435.669 909.002 1442.66 2093.5 713.168 2659.5"
+              stroke="#FF3B30"
+              strokeWidth="5"
+              strokeLinecap="round"
+              transform="translate(80, 0)"
+              className="opacity-60 filter drop-shadow-[0_0_8px_#FF3B30]"
+            />
+          </svg>
+        </div>
+
+      </div>
+
+      {/* ── LOWER SCROLLABLE SECTION (Quotes & Fan Base) ── */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 pt-24 border-t border-marathon-green/15 bg-marathon-darkest">
+        
+        {/* Voz del Hincha subtitle header */}
+        <div className="text-center mb-16">
+          <span className="text-xs font-heading font-semibold uppercase tracking-[0.3em] text-marathon-lime/70 mb-3 block">
+            Voz del Hincha
+          </span>
+          <h3 className="text-4xl md:text-5xl font-heading font-black text-white uppercase">
+            La Hinchada <span className="text-marathon-lime">Habla</span>
+          </h3>
+          <p className="text-marathon-light/40 text-sm mt-3 max-w-lg mx-auto">
+            Fidelidad inquebrantable, amor eterno por estos colores.
+          </p>
+        </div>
+
+        {/* Quotes Card Carousel */}
+        <div className="passion-quotes-card relative max-w-3xl mx-auto">
+          <div className="glass-card rounded-3xl p-8 md:p-12 text-center min-h-[280px] flex flex-col items-center justify-center">
+            {/* Quote Icon */}
+            <Quote
+              size={40}
+              className="text-marathon-green/30 mb-6"
+            />
+
+            {/* Carousel quotes wrapper */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentQuote}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.4 }}
+              >
+                <blockquote className="text-xl md:text-2xl lg:text-3xl font-heading font-medium text-marathon-light leading-relaxed mb-6">
+                  &ldquo;{FAN_QUOTES[currentQuote].text}&rdquo;
+                </blockquote>
+                <cite className="text-marathon-lime text-sm font-heading not-italic flex items-center justify-center gap-2">
+                  <Heart size={14} className="fill-marathon-lime" />
+                  {FAN_QUOTES[currentQuote].author}
+                </cite>
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Quote Dots navigation bar */}
+            <div className="flex items-center gap-4 mt-8">
+              <button
+                onClick={prevQuote}
+                className="w-10 h-10 rounded-full border border-marathon-green/30 flex items-center justify-center text-marathon-light/50 hover:text-marathon-lime hover:border-marathon-lime/50 transition-all duration-300 cursor-pointer"
+                aria-label="Previous quote"
+              >
+                <ChevronLeft size={18} />
+              </button>
+
+              <div className="flex items-center gap-2">
+                {FAN_QUOTES.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentQuote(index)}
+                    className={`w-2 h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                      index === currentQuote
+                        ? "bg-marathon-lime w-6"
+                        : "bg-marathon-light/20 hover:bg-marathon-light/40"
+                    }`}
+                    aria-label={`Quote ${index + 1}`}
+                  />
+                ))}
+              </div>
+
+              <button
+                onClick={nextQuote}
+                className="w-10 h-10 rounded-full border border-marathon-green/30 flex items-center justify-center text-marathon-light/50 hover:text-marathon-lime hover:border-marathon-lime/50 transition-all duration-300 cursor-pointer"
+                aria-label="Next quote"
+              >
+                <ChevronRight size={18} />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Action Button */}
+        <div className="passion-cta-block text-center mt-10">
+          <Button variant="outline" size="lg" href="/hinchada">
+            Únete a la hinchada
+            <ArrowRight size={18} />
+          </Button>
+        </div>
+      </div>
     </section>
   );
 }

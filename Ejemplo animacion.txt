@@ -1,0 +1,259 @@
+HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Draw SVG Stroke On Scroll | Codegrid</title>
+    <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+    <section class="hero">
+        <h1>Designed to keep information clear and connected</h1>
+    </section>
+
+    <section class="spotlight">
+        <!-- Fila 1 (Imagen 1) -->
+        <div class="row">
+            <div class="img"><img src="/img_1.svg" /></div>
+        </div>
+        
+        <!-- Fila 2 (Tarjeta 1 e Imagen 2) -->
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <h2>A cleaner way to handle incoming updates</h2>
+                    <p>
+                        Instead of showing every message or notification instantly, the
+                        app groups related items and presents them in an organized panel.
+                        It keeps your workspace calm, even when activity spikes.
+                    </p>
+                </div>
+            </div>
+            <div class="col">
+                <div class="img"><img src="/img_2.svg" /></div>
+            </div>
+        </div>
+
+        <!-- Fila 3 (Imagen 3 y Tarjeta 2) -->
+        <div class="row">
+            <div class="col">
+                <div class="img"><img src="/img_3.svg" /></div>
+            </div>
+            <div class="col">
+                <div class="card">
+                    <h2>Built for increasing information demands</h2>
+                    <p>
+                        Whether it is files, notes, or incoming messages, the app sorts
+                        and prioritizes items automatically. It prevents clutter and helps
+                        maintain clarity during busy periods.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fila 4 (Imagen 4) -->
+        <div class="row">
+            <div class="col">
+                <div class="img"><img src="/img_4.svg" /></div>
+            </div>
+        </div>
+
+        <!-- Contenedor del trazo SVG de fondo animado -->
+        <div class="svg-path">
+            <svg
+                viewBox="0 0 1378 2760"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                preserveAspectRatio="xMidYMin meet"
+            >
+                <path
+                    id="stroke-path"
+                    d="M639.668 100C639.668 100 105.669 100 199.669 601.503C293.669 1103.01 1277.17 691.502 1277.17 1399.5C1277.17 2107.5 -155.332 1968 140.168 1438 5C435.669 909.002 1442.66 2093.5 713.168 2659.5"
+                    stroke="#FF5F0A"
+                    stroke-width="200"
+                    stroke-linecap="round"
+                />
+            </svg>
+        </div>
+    </section>
+
+    <section class="outro">
+        <h1>Clearer organization ready for whatever comes next</h1>
+    </section>
+
+    <script type="module" src="/script.js"></script>
+</body>
+</html>
+
+
+
+
+CSS
+Aquí tienes la transcripción completa de los nuevos estilos y el archivo CSS totalmente unificado. Con estas imágenes ya tenemos toda la estructura visual de la sección `.spotlight`, el diseño en columnas de las tarjetas y el posicionamiento absoluto del contenedor del SVG de fondo para que el trazo se dibuje correctamente entre los elementos al hacer scroll.
+
+### Código CSS Completo e Integrado (`styles.css`)
+
+```css
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap");
+
+:root {
+  --base-100: #fafaf0;
+  --base-200: #deded5;
+  --base-300: #0f0f0f;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Manrope", sans-serif;
+  background-color: var(--base-100);
+  color: var(--base-300);
+}
+
+h1,
+h2 {
+  font-weight: 500;
+  line-height: 1.1;
+}
+
+h1 {
+  font-size: 4rem;
+  letter-spacing: -0.1rem;
+}
+
+h2 {
+  font-size: 2.5rem;
+  letter-spacing: -0.075rem;
+}
+
+p {
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+.hero,
+.outro {
+  position: relative;
+  width: 100%;
+  height: 100svh;
+  padding: 2rem;
+  background-color: var(--base-200);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.hero h1,
+.outro h1 {
+  width: 60%;
+  text-align: center;
+}
+
+/* ==========================================================================
+   Estilos de la sección Spotlight (Nuevas Imágenes)
+   ========================================================================== */
+
+.spotlight {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 10rem;
+  overflow: hidden;
+}
+
+.spotlight .row {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.spotlight .row .col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Ajuste de ancho para las imágenes de la primera y cuarta fila */
+.spotlight .row:nth-child(1) .img,
+.spotlight .row:nth-child(4) .img {
+  width: 50%;
+}
+
+/* Estilos de las Tarjetas de Información */
+.spotlight .card {
+  width: 75%;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: var(--base-200);
+  border-radius: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Posicionamiento del Trazo SVG de Fondo */
+.spotlight .svg-path {
+  position: absolute;
+  top: 25svh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  height: 100%;
+  z-index: -1;
+}
+
+.spotlight .svg-path svg {
+  width: 100%;
+  height: auto;
+}
+
+
+
+Lógica
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Lenis from "lenis";
+
+gsap.registerPlugin(ScrollTrigger);
+
+document.addEventListener("DOMContentLoaded", () => {
+    // Configuración de Lenis (Smooth Scroll)
+    const lenis = new Lenis();
+    
+    lenis.on("scroll", ScrollTrigger.update);
+    
+    gsap.ticker.add((time) => {
+        lenis.raf(time * 1000);
+    });
+    
+    gsap.ticker.lagSmoothing(0);
+    
+    // Configuración del trazo SVG
+    const path = document.getElementById("stroke-path");
+    const pathLength = path.getTotalLength();
+    
+    path.style.strokeDasharray = pathLength;
+    path.style.strokeDashoffset = pathLength;
+
+    // Animación de GSAP conectada al scroll
+    gsap.to(path, {
+        strokeDashoffset: 0,
+        ease: "none",
+        scrollTrigger: {
+            trigger: ".spotlight",
+            start: "top top",
+            end: "bottom bottom",
+            scrub: true,
+        },
+    });
+});

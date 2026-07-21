@@ -23,14 +23,22 @@ export default function SmoothScroll() {
     // Sync Lenis with GSAP ScrollTrigger
     lenis.on("scroll", ScrollTrigger.update);
 
-    gsap.ticker.add((time) => {
+    // Resize Lenis when GSAP ScrollTrigger refreshes (preventing height mismatch scroll locks)
+    const resizeHandler = () => {
+      lenis.resize();
+    };
+    ScrollTrigger.addEventListener("refresh", resizeHandler);
+
+    const updatePhysics = (time: number) => {
       lenis.raf(time * 1000);
-    });
+    };
+    gsap.ticker.add(updatePhysics);
     gsap.ticker.lagSmoothing(0);
 
     return () => {
       lenis.destroy();
-      gsap.ticker.remove(lenis.raf as any);
+      gsap.ticker.remove(updatePhysics);
+      ScrollTrigger.removeEventListener("refresh", resizeHandler);
     };
   }, []);
 
