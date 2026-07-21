@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, UserCheck } from "lucide-react";
 import { PLAYERS } from "@/lib/players-data";
@@ -24,6 +24,10 @@ export default function TeamClient() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
 
+  const handlePlayerClick = useCallback((player: Player) => {
+    setSelectedPlayer(player);
+  }, []);
+
   // Filter players based on selected position tab and search input text
   const filteredPlayers = useMemo(() => {
     return PLAYERS.filter((player) => {
@@ -40,9 +44,11 @@ export default function TeamClient() {
   // Find captain to highlight in hero if needed or display custom alert
   const captain = useMemo(() => PLAYERS.find((p) => p.isCaptain), []);
 
+  // Memoize StaffSection to prevent redundant re-renders when activeFilter or searchQuery changes
+  const memoizedStaff = useMemo(() => <StaffSection />, []);
+
   return (
     <div className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-
       {/* Control Bar: Filters & Search */}
       <div className="flex flex-col md:flex-row gap-6 justify-between items-center mb-10 pb-6 border-b border-marathon-green/10">
         {/* Position Tab Filters */}
@@ -54,8 +60,8 @@ export default function TeamClient() {
                 key={option.id}
                 onClick={() => setActiveFilter(option.id)}
                 className={`relative px-4 py-2 text-xs sm:text-sm font-heading font-medium rounded-full transition-all duration-300 whitespace-nowrap cursor-pointer ${isActive
-                    ? "text-marathon-darkest"
-                    : "text-marathon-light/70 hover:text-marathon-light"
+                  ? "text-marathon-darkest"
+                  : "text-marathon-light/70 hover:text-marathon-light"
                   }`}
               >
                 {isActive && (
@@ -87,28 +93,24 @@ export default function TeamClient() {
       </div>
 
       {/* Grid of Players with Framer Motion layout transitions */}
-      <motion.div
-        layout
-        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
-      >
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         <AnimatePresence mode="popLayout">
           {filteredPlayers.map((player) => (
             <motion.div
               key={player.id}
-              layout
-              initial={{ opacity: 0, scale: 0.9 }}
+              initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.3 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
             >
               <PlayerCard
                 player={player}
-                onClick={() => setSelectedPlayer(player)}
+                onClick={handlePlayerClick}
               />
             </motion.div>
           ))}
         </AnimatePresence>
-      </motion.div>
+      </div>
 
       {/* Empty State */}
       {filteredPlayers.length === 0 && (
@@ -171,7 +173,7 @@ export default function TeamClient() {
       )}
 
       {/* Staff / Coaching Section */}
-      <StaffSection />
+      {memoizedStaff}
 
       {/* Player Detail Modal */}
       <AnimatePresence>
