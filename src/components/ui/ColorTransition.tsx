@@ -12,119 +12,120 @@ interface ColorTransitionProps {
 }
 
 /**
- * Savage Claw Tear Transition Component.
- * Replaces the soft, aquatic waves with double-layered jagged claw-slash SVG paths.
- * Renders glowing claw-slash embers/splinters and shaking parallax background headers
- * that react to scroll velocity, evoking the raw power of the Green Monster.
+ * Liquid Curtain Transition.
+ *
+ * Two soft bezier waves rise smoothly (sine easing, continuous motion — no
+ * held pauses, no jagged spikes, no shake) to reveal the next section's
+ * color. A blurred light sweep travels across the crest, and a handful of
+ * soft drifting orbs add atmosphere without noise. Everything eases with
+ * sine.inOut so the motion reads as fluid rather than mechanical.
  */
 export default function ColorTransition({
   from,
   to,
-  accentColor = "#2E9C3F", // CD Marathon Green
+  accentColor = "#92BF4E",
   text = "",
-  height = "260px",
+  height = "80vh",
 }: ColorTransitionProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const tear1Ref = useRef<SVGPathElement>(null);
-  const tear2Ref = useRef<SVGPathElement>(null);
+  const waveBackRef = useRef<SVGPathElement>(null);
+  const waveFrontRef = useRef<SVGPathElement>(null);
+  const glowSweepRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
-  const particleContainerRef = useRef<HTMLDivElement>(null);
+  const orbsRef = useRef<HTMLDivElement>(null);
+
+  // All path states share the same command structure (M, three C's, L, L, Z)
+  // so GSAP can tween the `d` string smoothly, value by value, without a
+  // morph plugin — the curves stay curves the whole way through.
+  const FLAT_BOTTOM =
+    "M0,320 C480,320 480,320 720,320 C960,320 960,320 1440,320 L1440,320 L0,320 Z";
+  const CREST_BACK =
+    "M0,320 C300,200 480,150 720,190 C960,230 1140,120 1440,170 L1440,320 L0,320 Z";
+  const CREST_FRONT =
+    "M0,320 C280,240 480,90 720,130 C960,170 1180,60 1440,110 L1440,320 L0,320 Z";
+  const FULL_COVER =
+    "M0,0 C480,0 480,0 720,0 C960,0 960,0 1440,0 L1440,320 L0,320 Z";
 
   useEffect(() => {
     if (!containerRef.current) return;
 
     const ctx = gsap.context(() => {
-      // ── JAGGED TEAR 1 PATHS (Savage accent claw tear) ────────────────
-      const tear1Start = "M 0,300 L 1440,300 L 1440,300 L 0,300 Z";
-      // Hand-crafted jagged, sharp, claw-ripped profile
-      const tear1Mid = "M 0,280 L 120,290 L 220,110 L 380,240 L 460,90 L 590,260 L 730,70 L 860,230 L 980,120 L 1110,250 L 1240,80 L 1340,210 L 1440,160 L 1440,300 L 0,300 Z";
-      const tear1End = "M 0,0 L 1440,0 L 1440,300 L 0,300 Z";
-
-      // ── JAGGED TEAR 2 PATHS (Main target color claw tear) ─────────────
-      const tear2Start = "M 0,300 L 1440,300 L 1440,300 L 0,300 Z";
-      // Off-beat jagged paths to create organic claw overlap layering
-      const tear2Mid = "M 0,290 L 150,260 L 280,180 L 400,270 L 520,150 L 640,280 L 760,130 L 890,240 L 1020,160 L 1150,260 L 1280,140 L 1380,230 L 1440,210 L 1440,300 L 0,300 Z";
-      const tear2End = "M 0,0 L 1440,0 L 1440,300 L 0,300 Z";
-
-      // Master Scroll-driven timeline
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: containerRef.current,
           start: "top bottom",
           end: "bottom top",
-          scrub: 1.1,
+          scrub: 1.2,
         },
       });
 
-      // Tear 1 Morph
-      tl.to(
-        tear1Ref.current,
-        {
-          attr: { d: tear1Mid },
-          duration: 0.5,
-          ease: "power2.inOut",
-        },
+      // Back wave — slightly delayed, softer, larger blur — reads as depth
+      tl.fromTo(
+        waveBackRef.current,
+        { attr: { d: FLAT_BOTTOM } },
+        { attr: { d: CREST_BACK }, duration: 0.5, ease: "sine.inOut" },
+        0.05
+      ).to(
+        waveBackRef.current,
+        { attr: { d: FULL_COVER }, duration: 0.5, ease: "sine.inOut" },
+        0.55
+      );
+
+      // Front wave — leads slightly, crisper, no blur
+      tl.fromTo(
+        waveFrontRef.current,
+        { attr: { d: FLAT_BOTTOM } },
+        { attr: { d: CREST_FRONT }, duration: 0.5, ease: "sine.inOut" },
         0
       ).to(
-        tear1Ref.current,
-        {
-          attr: { d: tear1End },
-          duration: 0.5,
-          ease: "power1.inOut",
-        },
+        waveFrontRef.current,
+        { attr: { d: FULL_COVER }, duration: 0.5, ease: "sine.inOut" },
         0.5
       );
 
-      // Tear 2 Morph (delayed to overlap)
-      tl.to(
-        tear2Ref.current,
-        {
-          attr: { d: tear2Mid },
-          duration: 0.5,
-          ease: "power3.inOut",
-        },
-        0.12
-      ).to(
-        tear2Ref.current,
-        {
-          attr: { d: tear2End },
-          duration: 0.5,
-          ease: "power1.inOut",
-        },
-        0.62
-      );
+      // Light sweep traveling across the crest, continuous, no snapping
+      if (glowSweepRef.current) {
+        tl.fromTo(
+          glowSweepRef.current,
+          { xPercent: -30, opacity: 0 },
+          { xPercent: 30, opacity: 0.9, duration: 0.6, ease: "sine.inOut" },
+          0.05
+        ).to(
+          glowSweepRef.current,
+          { opacity: 0, duration: 0.3, ease: "sine.in" },
+          0.65
+        );
+      }
 
-      // Parallax Text Scale + Savage Shake/Tremor effect
+      // Background text: soft depth-of-field resolve (blur -> sharp -> blur out)
       if (textRef.current) {
         tl.fromTo(
           textRef.current,
-          { yPercent: 30, opacity: 0, scale: 0.92, rotation: -2 },
-          { 
-            yPercent: -30, 
-            opacity: 0.15, 
-            scale: 1.08, 
-            rotation: 2,
-            duration: 1, 
-            ease: "none" 
+          { yPercent: 14, opacity: 0, scale: 0.96, filter: "blur(10px)" },
+          {
+            yPercent: -14,
+            opacity: 0.14,
+            scale: 1.04,
+            filter: "blur(0px)",
+            duration: 1,
+            ease: "sine.inOut",
           },
           0
         );
       }
 
-      // Claw Scratch Splinters Flowing Upward
-      if (particleContainerRef.current) {
-        const splinters = particleContainerRef.current.children;
-        Array.from(splinters).forEach((splinter, idx) => {
-          const speed = 70 + idx * 40;
+      // Drifting orbs — slow, minimal, continuous upward float
+      if (orbsRef.current) {
+        const orbs = orbsRef.current.children;
+        gsap.utils.toArray(orbs).forEach((orb, i) => {
           tl.fromTo(
-            splinter,
-            { y: speed * 0.9, opacity: 0, rotation: gsap.utils.random(-45, 45) },
+            orb as Element,
+            { y: 40, opacity: 0 },
             {
-              y: -speed * 1.3,
-              opacity: gsap.utils.random(0.4, 0.9),
-              rotation: gsap.utils.random(90, 270),
+              y: -60 - i * 12,
+              opacity: 0.5,
               duration: 1,
-              ease: "none",
+              ease: "sine.inOut",
             },
             0
           );
@@ -141,16 +142,16 @@ export default function ColorTransition({
       className="w-full relative overflow-hidden z-10 select-none pointer-events-none"
       style={{ height, backgroundColor: from }}
     >
-      {/* Background Parallax Outline Text */}
+      {/* Background parallax text with cinematic depth-of-field resolve */}
       {text && (
         <div
           ref={textRef}
           className="absolute inset-0 flex items-center justify-center pointer-events-none z-0"
         >
           <span
-            className="text-[13vw] font-black font-elrotex tracking-wider text-white uppercase select-none opacity-0"
+            className="text-[13vw] font-black font-elrotex tracking-wider uppercase select-none opacity-0"
             style={{
-              WebkitTextStroke: "1.5px rgba(255, 255, 255, 0.15)",
+              WebkitTextStroke: "1.5px rgba(255,255,255,0.15)",
               color: "transparent",
             }}
           >
@@ -159,48 +160,50 @@ export default function ColorTransition({
         </div>
       )}
 
-      {/* Floating Savage Embers/Splinters (Jagged Polygon Shapes) */}
-      <div
-        ref={particleContainerRef}
-        className="absolute inset-0 w-full h-full pointer-events-none z-20 overflow-hidden"
-      >
-        {[...Array(8)].map((_, i) => (
+      {/* Soft drifting orbs — minimal, blurred, atmospheric */}
+      <div ref={orbsRef} className="absolute inset-0 z-10 pointer-events-none">
+        {[...Array(5)].map((_, i) => (
           <div
             key={i}
-            className="absolute opacity-0"
+            className="absolute rounded-full opacity-0"
             style={{
-              width: `${10 + ((i * 7) % 15)}px`,
-              height: `${4 + ((i * 3) % 5)}px`,
-              backgroundColor: i % 2 === 0 ? accentColor : "#92BF4E",
-              left: `${10 + i * 11}%`,
-              top: `${50 + (((i * 13) % 31) - 15)}%`,
-              // Styled as a sharp, jagged splinter/spark
-              clipPath: "polygon(0% 50%, 100% 0%, 80% 50%, 100% 100%)",
-              filter: `drop-shadow(0 0 8px ${accentColor})`,
-              boxShadow: `0 0 12px ${accentColor}`,
+              width: `${6 + i * 2}px`,
+              height: `${6 + i * 2}px`,
+              left: `${15 + i * 18}%`,
+              bottom: `${10 + (i % 3) * 8}%`,
+              backgroundColor: accentColor,
+              filter: "blur(3px)",
             }}
           />
         ))}
       </div>
 
-      {/* Savage Torn Edge Dividers */}
+      {/* Light sweep across the crest */}
+      <div
+        ref={glowSweepRef}
+        className="absolute inset-0 z-20 pointer-events-none opacity-0"
+        style={{
+          background: `radial-gradient(ellipse 40% 60% at 50% 35%, ${accentColor}55, transparent 70%)`,
+          filter: "blur(18px)",
+        }}
+      />
+
+      {/* Liquid waves */}
       <svg
-        viewBox="0 0 1440 300"
-        className="absolute bottom-0 left-0 w-full h-full preserve-3d"
+        viewBox="0 0 1440 320"
+        className="absolute bottom-0 left-0 w-full h-full"
         preserveAspectRatio="none"
       >
-        {/* Layer 1: Green/Lime accent tear */}
         <path
-          ref={tear1Ref}
-          d="M 0,300 L 1440,300 L 1440,300 L 0,300 Z"
-          fill={accentColor}
-          opacity="0.8"
+          ref={waveBackRef}
+          d="M0,320 C480,320 480,320 720,320 C960,320 960,320 1440,320 L1440,320 L0,320 Z"
+          fill={to}
+          opacity="0.5"
+          style={{ filter: "blur(6px)" }}
         />
-
-        {/* Layer 2: Main transition target color tear */}
         <path
-          ref={tear2Ref}
-          d="M 0,300 L 1440,300 L 1440,300 L 0,300 Z"
+          ref={waveFrontRef}
+          d="M0,320 C480,320 480,320 720,320 C960,320 960,320 1440,320 L1440,320 L0,320 Z"
           fill={to}
         />
       </svg>

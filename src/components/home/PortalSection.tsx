@@ -117,23 +117,8 @@ export default function PortalSection() {
     if (isLoaded) {
       const gsapCtx = gsap.context(() => {
         const frameObj = { frame: 1 };
-        let frameTween: gsap.core.Tween | null = null;
 
-        const playMonsterAnimation = () => {
-          if (frameTween) frameTween.kill();
-          frameTween = gsap.to(frameObj, {
-            frame: TOTAL_FRAMES,
-            duration: 1.4, // Cycles all 99 frames over 1.4 seconds at maximum screen refresh rate
-            ease: "power2.out",
-            onUpdate: () => {
-              const targetFrame = Math.round(frameObj.frame);
-              if (targetFrame !== currentFrameRef.current) {
-                currentFrameRef.current = targetFrame;
-                drawFrame(targetFrame);
-              }
-            },
-          });
-        };
+
 
         const tl = gsap.timeline({
           scrollTrigger: {
@@ -143,13 +128,14 @@ export default function PortalSection() {
             scrub: 1.2,
             pin: pinRef.current,
             anticipatePin: 1,
-            onEnter: playMonsterAnimation,
-            onEnterBack: playMonsterAnimation,
-            onLeaveBack: () => {
-              if (frameTween) frameTween.kill();
-              frameObj.frame = 1;
-              currentFrameRef.current = 1;
-              drawFrame(1);
+            onUpdate: (self) => {
+              // primeros 50% del scroll = secuencia de frames del monstruo
+              const frameProgress = Math.min(self.progress / 0.5, 1);
+              const targetFrame = Math.max(1, Math.round(frameProgress * (TOTAL_FRAMES - 1)) + 1);
+              if (targetFrame !== currentFrameRef.current) {
+                currentFrameRef.current = targetFrame;
+                drawFrame(targetFrame);
+              }
             },
           },
         });
@@ -288,8 +274,7 @@ export default function PortalSection() {
         {/* Ambient Dark Esports Grid Overlay */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(46,156,63,0.015)_1.5px,transparent_1.5px),linear-gradient(90deg,rgba(46,156,63,0.015)_1.5px,transparent_1.5px)] bg-[size:45px_45px] pointer-events-none z-0" />
 
-        {/* Soft Letterbox Cinema Bars */}
-        <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/85 via-black/30 to-transparent pointer-events-none z-20" />
+        {/* Soft Letterbox Cinema Bar (Bottom only to avoid top border seam) */}
         <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/85 via-black/30 to-transparent pointer-events-none z-20" />
 
         {/* Loading HUD Screen */}

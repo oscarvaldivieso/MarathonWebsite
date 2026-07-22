@@ -4,82 +4,42 @@ HTML
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Draw SVG Stroke On Scroll | Codegrid</title>
+    <title>IronHill Scroll Animation | Codegrid</title>
     <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
     <section class="hero">
-        <h1>Designed to keep information clear and connected</h1>
-    </section>
-
-    <section class="spotlight">
-        <!-- Fila 1 (Imagen 1) -->
-        <div class="row">
-            <div class="img"><img src="/img_1.svg" /></div>
-        </div>
-        
-        <!-- Fila 2 (Tarjeta 1 e Imagen 2) -->
-        <div class="row">
-            <div class="col">
-                <div class="card">
-                    <h2>A cleaner way to handle incoming updates</h2>
-                    <p>
-                        Instead of showing every message or notification instantly, the
-                        app groups related items and presents them in an organized panel.
-                        It keeps your workspace calm, even when activity spikes.
-                    </p>
-                </div>
-            </div>
-            <div class="col">
-                <div class="img"><img src="/img_2.svg" /></div>
-            </div>
+        <div class="hero-img">
+            <img src="/hero-img.jpg" alt="" />
         </div>
 
-        <!-- Fila 3 (Imagen 3 y Tarjeta 2) -->
-        <div class="row">
-            <div class="col">
-                <div class="img"><img src="/img_3.svg" /></div>
-            </div>
-            <div class="col">
-                <div class="card">
-                    <h2>Built for increasing information demands</h2>
-                    <p>
-                        Whether it is files, notes, or incoming messages, the app sorts
-                        and prioritizes items automatically. It prevents clutter and helps
-                        maintain clarity during busy periods.
-                    </p>
-                </div>
-            </div>
+        <div class="hero-header">
+            <h1>Morphogenesis</h1>
+            <p>Solid form gives way to liquid movement.</p>
         </div>
 
-        <!-- Fila 4 (Imagen 4) -->
-        <div class="row">
-            <div class="col">
-                <div class="img"><img src="/img_4.svg" /></div>
-            </div>
-        </div>
+        <canvas class="hero-canvas"></canvas>
 
-        <!-- Contenedor del trazo SVG de fondo animado -->
-        <div class="svg-path">
-            <svg
-                viewBox="0 0 1378 2760"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                preserveAspectRatio="xMidYMin meet"
-            >
-                <path
-                    id="stroke-path"
-                    d="M639.668 100C639.668 100 105.669 100 199.669 601.503C293.669 1103.01 1277.17 691.502 1277.17 1399.5C1277.17 2107.5 -155.332 1968 140.168 1438 5C435.669 909.002 1442.66 2093.5 713.168 2659.5"
-                    stroke="#FF5F0A"
-                    stroke-width="200"
-                    stroke-linecap="round"
-                />
-            </svg>
+        <div class="hero-content">
+            <h2>
+                An underlying field of motion pushes and pulls the image across
+                its
+                surface, redistributing pixels in a way that feels organic and
+                constantly in flux.
+            </h2>
         </div>
     </section>
 
-    <section class="outro">
-        <h1>Clearer organization ready for whatever comes next</h1>
+    <section class="about">
+        <p>
+            This animation is driven by a real-time WebGL displacement process
+            where
+            interaction introduces force into the surface, causing form to bend,
+            stretch, and reorganize dynamically. Rather than relying on fixed
+            keyframes, the visual state evolves continuously, allowing motion to
+            feel organic, responsive, and materially present as the page
+            progresses.
+        </p>
     </section>
 
     <script type="module" src="/script.js"></script>
@@ -87,19 +47,12 @@ HTML
 </html>
 
 
-
-
 CSS
-Aquí tienes la transcripción completa de los nuevos estilos y el archivo CSS totalmente unificado. Con estas imágenes ya tenemos toda la estructura visual de la sección `.spotlight`, el diseño en columnas de las tarjetas y el posicionamiento absoluto del contenedor del SVG de fondo para que el trazo se dibuje correctamente entre los elementos al hacer scroll.
-
-### Código CSS Completo e Integrado (`styles.css`)
-
-```css
-@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&display=swap");
 
 :root {
-  --base-100: #fafaf0;
-  --base-200: #deded5;
+  --base-100: #ebf5df;
+  --base-200: #fec81d;
   --base-300: #0f0f0f;
 }
 
@@ -109,151 +62,292 @@ Aquí tienes la transcripción completa de los nuevos estilos y el archivo CSS t
   box-sizing: border-box;
 }
 
-body {
-  font-family: "Manrope", sans-serif;
-  background-color: var(--base-100);
-  color: var(--base-300);
+img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 h1,
 h2 {
+  text-transform: uppercase;
+  font-family: "Instrument Serif", sans-serif;
   font-weight: 500;
-  line-height: 1.1;
+  line-height: 0.9;
 }
 
 h1 {
-  font-size: 4rem;
-  letter-spacing: -0.1rem;
+  font-size: clamp(4rem, 7.5vw, 10rem);
 }
 
 h2 {
-  font-size: 2.5rem;
-  letter-spacing: -0.075rem;
+  font-size: clamp(2.5rem, 4.5vw, 5rem);
 }
 
 p {
+  font-family: "Instrument Sans", sans-serif;
   font-size: 1.125rem;
-  font-weight: 500;
+  font-weight: 400;
 }
 
-.hero,
-.outro {
+.hero {
   position: relative;
   width: 100%;
-  height: 100svh;
-  padding: 2rem;
-  background-color: var(--base-200);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  height: 175svh;
+  color: var(--base-200);
   overflow: hidden;
 }
 
-.hero h1,
-.outro h1 {
-  width: 60%;
+.hero-header {
+  position: absolute;
+  width: 100%;
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
   text-align: center;
 }
 
-/* ==========================================================================
-   Estilos de la sección Spotlight (Nuevas Imágenes)
-   ========================================================================== */
+.hero-header p {
+  width: 75%;
+}
 
-.spotlight {
+.hero-img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.hero-canvas {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.hero-content {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 125svh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.hero-content h2 {
+  width: 75%;
+  color: var(--base-300);
+}
+
+.about {
   position: relative;
   width: 100%;
-  height: 100%;
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 10rem;
-  overflow: hidden;
-}
-
-.spotlight .row {
+  height: 100svh;
   display: flex;
   justify-content: center;
-  gap: 2rem;
+  align-items: center;
+  background-color: var(--base-300);
+  color: var(--base-100);
 }
-
-.spotlight .row .col {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-/* Ajuste de ancho para las imágenes de la primera y cuarta fila */
-.spotlight .row:nth-child(1) .img,
-.spotlight .row:nth-child(4) .img {
-  width: 50%;
-}
-
-/* Estilos de las Tarjetas de Información */
-.spotlight .card {
-  width: 75%;
-  margin: 0 auto;
-  padding: 2rem;
-  background-color: var(--base-200);
-  border-radius: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-/* Posicionamiento del Trazo SVG de Fondo */
-.spotlight .svg-path {
-  position: absolute;
-  top: 25svh;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 90%;
-  height: 100%;
-  z-index: -1;
-}
-
-.spotlight .svg-path svg {
-  width: 100%;
-  height: auto;
-}
-
 
 
 Lógica
+export const vertexShader = `
+    varying vec2 vUv;
+    void main() {
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+`;
+
+export const fragmentShader = `
+    uniform float uProgress;
+    uniform vec2 uResolution;
+    uniform vec3 uColor;
+    uniform float uSpread;
+    varying vec2 vUv;
+
+    float Hash(vec2 p) {
+        vec3 p2 = vec3(p.xy, 1.0);
+        return fract(sin(dot(p2, vec3(37.1, 61.7, 12.4))) * 3758.5453123);
+    }
+
+    float noise(in vec2 p) {
+        vec2 i = floor(p);
+        vec2 f = fract(p);
+        f *= f * (3.0 - 2.0 * f);
+        return mix(
+            mix(Hash(i + vec2(0.0, 0.0)), Hash(i + vec2(1.0, 0.0)), f.x),
+            mix(Hash(i + vec2(0.0, 1.0)), Hash(i + vec2(1.0, 1.0)), f.x),
+            f.y
+        );
+    }
+
+    float fbm(vec2 p) {
+        float v = 0.0;
+        v += noise(p * 1.0) * 0.5;
+        v += noise(p * 2.0) * 0.25;
+        v += noise(p * 4.0) * 0.125;
+        return v;
+    }
+
+    void main() {
+        vec2 uv = vUv;
+        float aspect = uResolution.x / uResolution.y;
+        vec2 centeredUv = (uv - 0.5) * vec2(aspect, 1.0);
+
+        float dissolveEdge = uv.y - uProgress * 1.2;
+        float noiseValue = fbm(centeredUv * 15.0);
+        float d = dissolveEdge + noiseValue * uSpread;
+
+        float pixelSize = 1.0 / uResolution.y;
+        float alpha = 1.0 - smoothstep(-pixelSize, pixelSize, d);
+
+        gl_FragColor = vec4(uColor, alpha);
+    }
+`;
+
+
+
+import { vertexShader, fragmentShader } from "./shaders.js";
+
+import * as THREE from "three";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { SplitText } from "gsap/SplitText";
 import Lenis from "lenis";
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, SplitText);
 
-document.addEventListener("DOMContentLoaded", () => {
-    // Configuración de Lenis (Smooth Scroll)
-    const lenis = new Lenis();
-    
-    lenis.on("scroll", ScrollTrigger.update);
-    
-    gsap.ticker.add((time) => {
-        lenis.raf(time * 1000);
-    });
-    
-    gsap.ticker.lagSmoothing(0);
-    
-    // Configuración del trazo SVG
-    const path = document.getElementById("stroke-path");
-    const pathLength = path.getTotalLength();
-    
-    path.style.strokeDasharray = pathLength;
-    path.style.strokeDashoffset = pathLength;
+const lenis = new Lenis();
+function raf(time) {
+    lenis.raf(time);
+    ScrollTrigger.update();
+    requestAnimationFrame(raf);
+}
+requestAnimationFrame(raf);
+lenis.on("scroll", ScrollTrigger.update);
 
-    // Animación de GSAP conectada al scroll
-    gsap.to(path, {
-        strokeDashoffset: 0,
-        ease: "none",
-        scrollTrigger: {
-            trigger: ".spotlight",
-            start: "top top",
-            end: "bottom bottom",
-            scrub: true,
+const CONFIG = {
+    color: "#ebf5df",
+    spread: 0.5,
+    speed: 2,
+};
+
+const canvas = document.querySelector(".hero-canvas");
+const hero = document.querySelector(".hero");
+
+const scene = new THREE.Scene();
+const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+const renderer = new THREE.WebGLRenderer({
+    canvas,
+    alpha: true,
+    antialias: false,
+});
+
+function hexToRgb(hex) {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result
+        ? {
+              r: parseInt(result[1], 16) / 255,
+              g: parseInt(result[2], 16) / 255,
+              b: parseInt(result[3], 16) / 255,
+          }
+        : { r: 0.89, g: 0.89, b: 0.89 };
+}
+
+function resize() {
+    const width = hero.offsetWidth;
+    const height = hero.offsetHeight;
+    renderer.setSize(width, height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+}
+
+resize();
+window.addEventListener("resize", resize);
+
+const rgb = hexToRgb(CONFIG.color);
+const geometry = new THREE.PlaneGeometry(2, 2);
+const material = new THREE.ShaderMaterial({
+    vertexShader,
+    fragmentShader,
+    uniforms: {
+        uProgress: { value: 0 },
+        uResolution: {
+            value: new THREE.Vector2(hero.offsetWidth, hero.offsetHeight),
         },
-    });
+        uColor: { value: new THREE.Vector3(rgb.r, rgb.g, rgb.b) },
+        uSpread: { value: CONFIG.spread },
+    },
+    transparent: true,
+});
+
+const mesh = new THREE.Mesh(geometry, material);
+scene.add(mesh);
+
+let scrollProgress = 0;
+
+function animate() {
+    material.uniforms.uProgress.value = scrollProgress;
+    renderer.render(scene, camera);
+    requestAnimationFrame(animate);
+}
+
+animate();
+
+lenis.on("scroll", ({ scroll }) => {
+    const heroHeight = hero.offsetHeight;
+    const windowHeight = window.innerHeight;
+    const maxScroll = heroHeight - windowHeight;
+    scrollProgress = Math.min((scroll / maxScroll) * CONFIG.speed, 1.1);
+});
+
+window.addEventListener("resize", () => {
+    material.uniforms.uResolution.value.set(
+        hero.offsetWidth,
+        hero.offsetHeight
+    );
+});
+
+// Configuración de animación del texto revelado (SplitText + ScrollTrigger)
+const heroH2 = document.querySelector(".hero-content h2");
+const split = new SplitText(heroH2, { type: "words" });
+const words = split.words;
+
+gsap.set(words, { opacity: 0 });
+
+ScrollTrigger.create({
+    trigger: ".hero-content",
+    start: "top 25%",
+    end: "bottom 100%",
+    onUpdate: (self) => {
+        const progress = self.progress;
+        const totalWords = words.length;
+
+        words.forEach((word, index) => {
+            const wordProgress = index / totalWords;
+            const nextWordProgress = (index + 1) / totalWords;
+
+            let opacity = 0;
+
+            if (progress >= nextWordProgress) {
+                opacity = 1;
+            } else if (progress >= wordProgress) {
+                const fadeProgress =
+                    (progress - wordProgress) / (nextWordProgress - wordProgress);
+                opacity = fadeProgress;
+            }
+
+            gsap.to(word, {
+                opacity: opacity,
+                duration: 0.1,
+                overwrite: true,
+            });
+        });
+    },
 });

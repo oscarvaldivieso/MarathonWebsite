@@ -1,4 +1,5 @@
 import HeroSection from "@/components/home/HeroSection";
+import HeroPortalTransition from "@/components/home/HeroPortalTransition";
 import PortalSection from "@/components/home/PortalSection";
 import TemploSection from "@/components/home/TemploSection";
 import StatsSection from "@/components/home/StatsSection";
@@ -12,6 +13,7 @@ export default function HomePage() {
   return (
     <>
       <HeroSection />
+      <HeroPortalTransition />
       <PortalSection />
       <TemploSection />
 
