@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useEffect } from "react";
-import { gsap, ScrollTrigger } from "@/hooks/useGsap";
+import { gsap } from "@/hooks/useGsap";
 import { STATS } from "@/lib/constants";
 import { Trophy, Calendar, Users, Clock, ArrowRight } from "lucide-react";
 import Button from "@/components/ui/Button";

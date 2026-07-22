@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useEffect } from "react";
-import { gsap, ScrollTrigger } from "@/hooks/useGsap";
+import { gsap } from "@/hooks/useGsap";
 import { CLUB } from "@/lib/constants";
 import { ArrowRight, MapPin } from "lucide-react";
 import SectionTitle from "@/components/ui/SectionTitle";

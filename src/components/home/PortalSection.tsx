@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
-import { gsap, ScrollTrigger } from "@/hooks/useGsap";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { gsap } from "@/hooks/useGsap";
 
 const TOTAL_FRAMES = 99;
 const START_FRAME = 1;
@@ -17,109 +17,111 @@ export default function PortalSection() {
   const preloadedImagesRef = useRef<HTMLImageElement[]>([]);
   const currentFrameRef = useRef<number>(1);
 
-  useEffect(() => {
+  // ── DRAWING LOGIC (Object-Cover canvas scaling) ───────────
+  const drawFrame = useCallback((frameIndex: number) => {
     const canvas = canvasRef.current;
-    const container = containerRef.current;
-    if (!canvas || !container) return;
+    const ctx = canvas?.getContext("2d");
+    const img = preloadedImagesRef.current[frameIndex - 1];
+    if (!img || !canvas || !ctx) return;
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    const rect = canvas.getBoundingClientRect();
+    ctx.clearRect(0, 0, rect.width, rect.height);
 
+    const imgWidth = img.naturalWidth || img.width;
+    const imgHeight = img.naturalHeight || img.height;
+    const canvasWidth = rect.width;
+    const canvasHeight = rect.height;
+    const imgRatio = imgWidth / imgHeight;
+    const canvasRatio = canvasWidth / canvasHeight;
+
+    let drawWidth = canvasWidth;
+    let drawHeight = canvasHeight;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    if (canvasRatio > imgRatio) {
+      drawHeight = canvasWidth / imgRatio;
+      offsetY = (canvasHeight - drawHeight) / 2;
+    } else {
+      drawWidth = canvasHeight * imgRatio;
+      offsetX = (canvasWidth - drawWidth) / 2;
+    }
+
+    ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+  }, []);
+
+  // ── DYNAMIC RESIZING (Ensures crispness on Retina) ────────
+  const handleResize = useCallback(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext("2d");
+    if (!canvas || !ctx) return;
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) return;
+
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(dpr, dpr);
+
+    drawFrame(currentFrameRef.current);
+  }, [drawFrame]);
+
+  // ── ASSET PRELOADING SEQUENCE (runs once on mount) ────────
+  useEffect(() => {
     let isMounted = true;
     let loadedCount = 0;
-    const preloadedImages: HTMLImageElement[] = [];
-
-    // Helper to format frame file index (e.g. 1 -> "001")
+    const images: HTMLImageElement[] = [];
     const formatIndex = (index: number) => String(index).padStart(3, "0");
 
-    // ── DRAWING LOGIC (Object-Cover canvas scaling) ───────────
-    const drawFrame = (frameIndex: number) => {
-      const img = preloadedImages[frameIndex - 1];
-      if (!img || !canvas || !ctx) return;
+    const onSettled = (isFirst: boolean) => {
+      if (!isMounted) return;
+      loadedCount++;
+      setLoadingProgress(Math.round((loadedCount / TOTAL_FRAMES) * 100));
 
-      const dpr = window.devicePixelRatio || 1;
-      const rect = canvas.getBoundingClientRect();
-
-      // Clear previous frames cleanly
-      ctx.clearRect(0, 0, rect.width, rect.height);
-
-      const imgWidth = img.naturalWidth || img.width;
-      const imgHeight = img.naturalHeight || img.height;
-
-      const canvasWidth = rect.width;
-      const canvasHeight = rect.height;
-
-      const imgRatio = imgWidth / imgHeight;
-      const canvasRatio = canvasWidth / canvasHeight;
-
-      let drawWidth = canvasWidth;
-      let drawHeight = canvasHeight;
-      let offsetX = 0;
-      let offsetY = 0;
-
-      if (canvasRatio > imgRatio) {
-        drawHeight = canvasWidth / imgRatio;
-        offsetY = (canvasHeight - drawHeight) / 2;
-      } else {
-        drawWidth = canvasHeight * imgRatio;
-        offsetX = (canvasWidth - drawWidth) / 2;
+      if (isFirst) {
+        preloadedImagesRef.current = images;
+        drawFrame(START_FRAME);
       }
-
-      ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
-    };
-
-    // ── DYNAMIC RESIZING (Ensures crispness on Retina) ────────
-    const handleResize = () => {
-      if (!canvas || !ctx) return;
-      const dpr = window.devicePixelRatio || 1;
-      const rect = canvas.getBoundingClientRect();
-
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
-      ctx.scale(dpr, dpr);
-
-      drawFrame(currentFrameRef.current);
-    };
-
-    // ── ASSET PRELOADING SEQUENCE ─────────────────────────────
-    const loadImages = () => {
-      for (let i = START_FRAME; i <= TOTAL_FRAMES; i++) {
-        const img = new Image();
-        img.src = `/assets/hero/monster/frame_${formatIndex(i)}.png`;
-
-        img.onload = () => {
-          if (!isMounted) return;
-          loadedCount++;
-
-          const progress = Math.round((loadedCount / TOTAL_FRAMES) * 100);
-          setLoadingProgress(progress);
-
-          // Draw the start frame immediately as a preview
-          if (i === 1) {
-            drawFrame(1);
-          }
-
-          if (loadedCount === TOTAL_FRAMES) {
-            setIsLoaded(true);
-            preloadedImagesRef.current = preloadedImages;
-            handleResize();
-          }
-        };
-
-        preloadedImages.push(img);
+      if (loadedCount === TOTAL_FRAMES) {
+        preloadedImagesRef.current = images;
+        setIsLoaded(true);
       }
     };
 
-    loadImages();
+    for (let i = START_FRAME; i <= TOTAL_FRAMES; i++) {
+      const img = new Image();
+      img.onload = () => onSettled(i === START_FRAME);
+      img.onerror = () => onSettled(false);
+      img.src = `/assets/hero/monster/frame_${formatIndex(i)}.png`;
+      images.push(img);
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [drawFrame]);
+
+  // ── GSAP CINEMATIC SCROLL STORYTELLING (after preload) ────
+  useEffect(() => {
+    if (!isLoaded) return;
+    const container = containerRef.current;
+    if (!container) return;
+
+    handleResize();
     window.addEventListener("resize", handleResize);
 
-    // ── GSAP CINEMATIC SCROLL STORYTELLING ───────────────────
-    if (isLoaded) {
-      const gsapCtx = gsap.context(() => {
-        const frameObj = { frame: 1 };
+    // Reduced motion: show the first frame statically, skip pin/scrub.
+    const prefersReduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+    if (prefersReduced) {
+      currentFrameRef.current = 1;
+      drawFrame(1);
+      return () => window.removeEventListener("resize", handleResize);
+    }
 
-
-
+    const gsapCtx = gsap.context(() => {
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: container,
@@ -242,19 +244,13 @@ export default function PortalSection() {
           0.78
         );
 
-      }, containerRef);
-
-      return () => {
-        gsapCtx.revert();
-        window.removeEventListener("resize", handleResize);
-      };
-    }
+    }, containerRef);
 
     return () => {
-      isMounted = false;
+      gsapCtx.revert();
       window.removeEventListener("resize", handleResize);
     };
-  }, [isLoaded]);
+  }, [isLoaded, drawFrame, handleResize]);
 
   return (
     <div
@@ -303,14 +299,14 @@ export default function PortalSection() {
         </div>
 
         {/* Floating massive background lettering (Relocated and changed above the monster) */}
-        <div className="portal-title-wrapper absolute top-[7%] w-full text-center z-15 select-none pointer-events-none px-4">
+        <div className="portal-title-wrapper absolute top-[7%] w-full text-center z-[15] select-none pointer-events-none px-4">
           <h2 className="text-[7.5vw] md:text-[4.2rem] font-bold text-white/70 tracking-widest uppercase font-elrotex leading-none select-none">
             EL PORTAL DEL MONSTRUO
           </h2>
         </div>
 
         {/* Dynamic Claw Scratch Vector Overlay (Green, White, Red Tears) */}
-        <div className="portal-claw absolute inset-0 w-full h-full pointer-events-none z-25 flex items-center justify-center">
+        <div className="portal-claw absolute inset-0 w-full h-full pointer-events-none z-[25] flex items-center justify-center">
           <svg
             viewBox="0 0 3882 3882"
             className="portal-claw-svg w-[85vw] h-[85vw] max-w-[650px] max-h-[650px] aspect-square overflow-visible opacity-95"
@@ -344,7 +340,7 @@ export default function PortalSection() {
         </div>
 
         {/* Floating aggressive Elrotex slogans revealed by claw */}
-        <div className="portal-claw-text absolute left-1/2 top-[42%] -translate-x-1/2 -translate-y-1/2 z-25 pointer-events-none select-none opacity-0 will-change-transform text-center w-full">
+        <div className="portal-claw-text absolute left-1/2 top-[42%] -translate-x-1/2 -translate-y-1/2 z-[25] pointer-events-none select-none opacity-0 will-change-transform text-center w-full">
           <span className="block text-[8vw] md:text-[6.5rem] tracking-[0.08em] font-bold text-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.85)] font-elrotex leading-none uppercase">
             FURIA <span className="text-marathon-lime">VERDE</span>
           </span>
