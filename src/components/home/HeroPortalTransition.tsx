@@ -92,15 +92,32 @@ export default function HeroPortalTransition() {
     const canvas = canvasRef.current;
     if (!container || !canvas) return;
 
-    // ── THREE.JS SCENE & WEBG RENDERER SETUP ──────────────────────
+    // ── THREE.JS SCENE & WEBGL RENDERER SETUP ─────────────────────
     const scene = new THREE.Scene();
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-    const renderer = new THREE.WebGLRenderer({
-      canvas,
-      alpha: true,
-      antialias: false,
-      powerPreference: "high-performance",
-    });
+
+    // Guard: WebGL may be unavailable (older devices, disabled GPU). If the
+    // renderer can't be created, keep the section as a solid dark backdrop with
+    // the narrative text still readable, instead of crashing the whole page.
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({
+        canvas,
+        alpha: true,
+        antialias: false,
+        powerPreference: "high-performance",
+      });
+    } catch {
+      canvas.style.display = "none";
+      // Reveal the narrative text statically so the section isn't empty.
+      wordsRef.current.forEach((el) => {
+        if (el) {
+          el.style.opacity = "1";
+          el.style.transform = "none";
+        }
+      });
+      return;
+    }
 
     const rgbDark = hexToRgb("#0d551fff");   // casi negro, con tinte verde — cuerpo sólido
     const rgbGreen = hexToRgb("#178C4E");  // verde esmeralda medio — transición del borde
@@ -144,6 +161,28 @@ export default function HeroPortalTransition() {
       animationFrameId = requestAnimationFrame(animate);
     };
     animate();
+
+    // Reduced motion: render a settled state and reveal text without scrubbing.
+    const prefersReduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+    if (prefersReduced) {
+      material.uniforms.uProgress.value = 0.55;
+      renderer.render(scene, camera);
+      wordsRef.current.forEach((el) => {
+        if (el) {
+          el.style.opacity = "1";
+          el.style.transform = "none";
+        }
+      });
+      return () => {
+        cancelAnimationFrame(animationFrameId);
+        window.removeEventListener("resize", resize);
+        geometry.dispose();
+        material.dispose();
+        renderer.dispose();
+      };
+    }
 
     // ── GSAP SCROLLTRIGGER FOR SMOOTH CINEMATIC SCROLL STORYTELLING ────
     // Aligned with Ejemplo animacion.txt scroll mapping:

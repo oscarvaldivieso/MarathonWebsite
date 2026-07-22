@@ -1,17 +1,10 @@
 "use client";
 
 import React, { useRef, useEffect } from "react";
-import { ChevronDown, Clock, MapPin, Zap, ArrowRight } from "lucide-react";
-import { CLUB, NEXT_MATCH } from "@/lib/constants";
-import { gsap, ScrollTrigger } from "@/hooks/useGsap";
+import { ChevronDown, ArrowRight } from "lucide-react";
+import { NEXT_MATCH } from "@/lib/constants";
+import { gsap } from "@/hooks/useGsap";
 import Image from "next/image";
-
-function getDaysUntil(dateStr: string): number {
-  const target = new Date(dateStr + "T00:00:00");
-  const now = new Date();
-  const diff = target.getTime() - now.getTime();
-  return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
-}
 
 function formatMatchDate(dateStr: string): string {
   const date = new Date(dateStr + "T00:00:00");
@@ -23,7 +16,6 @@ function formatMatchDate(dateStr: string): string {
 }
 
 export default function HeroSection() {
-  const daysUntil = getDaysUntil(NEXT_MATCH.date);
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {

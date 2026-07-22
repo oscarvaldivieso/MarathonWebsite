@@ -2,8 +2,9 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { gsap, ScrollTrigger } from "@/hooks/useGsap";
-import { MapPin, Users, Trophy, ArrowRight, ChevronDown, Shield, Zap, Compass } from "lucide-react";
+import { Users, Trophy, ArrowRight, ChevronDown, Shield, Zap, Compass } from "lucide-react";
 import Button from "@/components/ui/Button";
+import { CLUB } from "@/lib/constants";
 
 // ─── Frame Sequence Config ────────────────────────────────────────────────────
 const TOTAL_FRAMES = 201;
@@ -67,7 +68,6 @@ function AnimCounter({
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function TemploSection() {
-  console.log("TemploSection component rendering!");
   const containerRef = useRef<HTMLDivElement>(null);
   const pinRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -80,7 +80,6 @@ export default function TemploSection() {
 
   // ── 1. ASSET PRELOADING SEQUENCE (Runs strictly ONCE on mount) ────────────────
   useEffect(() => {
-    console.log("TemploSection preloader mounted!");
     let isMounted = true;
     let loadedCount = 0;
     const images: HTMLImageElement[] = [];
@@ -95,7 +94,6 @@ export default function TemploSection() {
         setLoadingProgress(progress);
 
         if (loadedCount === TOTAL_FRAMES) {
-          console.log("TemploSection preload complete! images count:", images.length);
           preloadedImagesRef.current = images;
           setIsLoaded(true);
         }
@@ -108,7 +106,6 @@ export default function TemploSection() {
         setLoadingProgress(progress);
 
         if (loadedCount === TOTAL_FRAMES) {
-          console.log("TemploSection preload complete with errors! images count:", images.length);
           preloadedImagesRef.current = images;
           setIsLoaded(true);
         }
@@ -125,14 +122,17 @@ export default function TemploSection() {
 
   // ── 2. GSAP SCROLL ANIMATION (Triggered once loading completes) ────────────────
   useEffect(() => {
-    console.log("TemploSection scroll effect triggered! isLoaded:", isLoaded);
     if (!isLoaded) return;
 
     const canvas = canvasRef.current;
     const container = containerRef.current;
     const pin = pinRef.current;
-    console.log("TemploSection scroll effect refs status:", { canvas: !!canvas, container: !!container, pin: !!pin });
     if (!canvas || !container || !pin) return;
+
+    // Respect reduced-motion: draw a single static frame, skip scroll scrubbing.
+    const prefersReduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
@@ -143,24 +143,14 @@ export default function TemploSection() {
     // ── DRAWING LOGIC (Object-Cover canvas scaling) ───────────
     const drawFrame = (frameIndex: number) => {
       const img = preloadedImagesRef.current[frameIndex - 1];
-      if (!img) {
-        console.warn("drawFrame: Image at index is undefined:", frameIndex);
-        return;
-      }
+      if (!img) return;
 
       const imgWidth = img.naturalWidth || img.width;
       const imgHeight = img.naturalHeight || img.height;
-      console.log("drawFrame drawing:", img.src, "imgWidth:", imgWidth, "imgHeight:", imgHeight, "frameIndex:", frameIndex);
 
-      if (!canvas || !ctx || canvasWidth === 0 || canvasHeight === 0) {
-        console.warn("drawFrame skipped. Reason:", { canvas: !!canvas, ctx: !!ctx, canvasWidth, canvasHeight });
-        return;
-      }
+      if (!canvas || !ctx || canvasWidth === 0 || canvasHeight === 0) return;
 
-      if (imgWidth === 0 || imgHeight === 0) {
-        console.warn("drawFrame skipped due to 0-size image dimensions:", img.src);
-        return;
-      }
+      if (imgWidth === 0 || imgHeight === 0) return;
 
       // Clear previous frames cleanly
       ctx.clearRect(0, 0, canvasWidth, canvasHeight);
@@ -189,13 +179,9 @@ export default function TemploSection() {
       if (!canvas || !ctx) return;
       const dpr = window.devicePixelRatio || 1;
       const rect = canvas.getBoundingClientRect();
-      console.log("handleResize rect:", rect.width, "x", rect.height, "dpr:", dpr);
 
       // Guard against collapsed 0-size rects during rendering/transitions
-      if (rect.width === 0 || rect.height === 0) {
-        console.warn("handleResize skipped due to collapsed 0-size canvas rect");
-        return;
-      }
+      if (rect.width === 0 || rect.height === 0) return;
 
       canvasWidth = rect.width;
       canvasHeight = rect.height;
@@ -212,6 +198,15 @@ export default function TemploSection() {
 
     window.addEventListener("resize", handleResize);
 
+    // Reduced motion: show a representative static frame, skip pinning/scrub.
+    if (prefersReduced) {
+      currentFrameRef.current = 1;
+      drawFrame(1);
+      return () => {
+        window.removeEventListener("resize", handleResize);
+      };
+    }
+
     // ── GSAP CINEMATIC SCROLL STORYTELLING ───────────────────
     const gsapCtx = gsap.context(() => {
       const frameObj = { frame: 1 };
@@ -226,11 +221,7 @@ export default function TemploSection() {
           pin: pin,
           anticipatePin: 1,
           invalidateOnRefresh: true,
-          onUpdate: (self) => {
-            console.log("Templo ScrollTrigger update progress:", self.progress, "scrollY:", window.scrollY);
-          },
-          onRefresh: (self) => {
-            console.log("Templo ScrollTrigger refreshed! start:", self.start, "end:", self.end, "scrollDistance:", self.end - self.start);
+          onRefresh: () => {
             drawFrame(currentFrameRef.current);
           },
         },
@@ -394,11 +385,11 @@ export default function TemploSection() {
           />
 
           {/* ── Dark overlay for readability ── */}
-          <div className="absolute inset-0 bg-black/45 z-1 pointer-events-none" />
+          <div className="absolute inset-0 bg-black/45 z-[1] pointer-events-none" />
 
           {/* ── Cinematic Vignette ── */}
           <div
-            className="cueva-vignette absolute inset-0 pointer-events-none z-2"
+            className="cueva-vignette absolute inset-0 pointer-events-none z-[2]"
             style={{
               background:
                 "radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.9) 100%)",
@@ -575,10 +566,14 @@ export default function TemploSection() {
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-4 divide-y md:divide-y-0 md:divide-x divide-white/5">
               <div className="cueva-counter-item px-4 text-center py-4 md:py-0">
-                <AnimCounter target={99} suffix="+" label="Años de Orgullo" />
+                <AnimCounter
+                  target={new Date().getFullYear() - CLUB.founded}
+                  suffix="+"
+                  label="Años de Orgullo"
+                />
               </div>
               <div className="cueva-counter-item px-4 text-center py-4 md:py-0">
-                <AnimCounter target={9} label="Títulos de Liga" />
+                <AnimCounter target={CLUB.titles} label="Títulos de Liga" />
               </div>
               <div className="cueva-counter-item px-4 text-center py-4 md:py-0">
                 <AnimCounter target={50} suffix="K+" label="Seguidores" />
