@@ -167,96 +167,7 @@ export default function PassionSection() {
       {/* ── SPOTLIGHT CONTAINER (Wavy SVG drawing path) ─────────────────── */}
       <div className="spotlight relative w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 flex flex-col gap-32 md:gap-44 overflow-visible z-10">
         
-        {/* Fila 1 (Imagen Histórica Centrada) */}
-        <div className="row flex justify-center items-center">
-          <div className="row-1-img img-wrapper w-full max-w-[650px] aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border border-white/10 filter drop-shadow-[0_15px_30px_rgba(14,114,29,0.25)] opacity-0 will-change-transform">
-            <img 
-              src={SLIDES[0].image} 
-              alt="Club Deportivo Marathón 1925" 
-              className="w-full h-full object-cover select-none pointer-events-none"
-            />
-          </div>
-        </div>
-
-        {/* Fila 2 (Tarjeta 1 a la izquierda, Imagen 2 a la derecha) */}
-        <div className="row grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center">
-          <div className="col flex flex-col justify-center">
-            <div className="row-2-card card-box glass-card p-6 md:p-10 rounded-3xl border border-white/10 shadow-2xl space-y-4 max-w-[500px] mx-auto md:mr-0 opacity-0 will-change-transform">
-              <span className="text-marathon-lime font-bold tracking-[0.25em] text-xs uppercase block">
-                {SLIDES[0].category}
-              </span>
-              <h3 className="text-2xl md:text-3xl font-heading font-black text-white leading-tight uppercase">
-                {SLIDES[0].title}
-              </h3>
-              <p className="text-marathon-light/80 font-body text-sm md:text-base leading-relaxed">
-                {SLIDES[0].text}
-              </p>
-            </div>
-          </div>
-          <div className="col flex justify-center">
-            <div className="row-2-img img-wrapper w-full max-w-[480px] aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border border-white/10 filter drop-shadow-[0_15px_30px_rgba(255,255,255,0.15)] opacity-0 will-change-transform">
-              <img 
-                src={SLIDES[1].image} 
-                alt="Celebración Plantel de Marathón" 
-                className="w-full h-full object-cover select-none pointer-events-none"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Fila 3 (Imagen 3 a la izquierda, Tarjeta 2 a la derecha) */}
-        <div className="row grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center">
-          <div className="col flex justify-center md:order-1 order-2">
-            <div className="row-3-img img-wrapper w-full max-w-[480px] aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border border-white/10 filter drop-shadow-[0_15px_30px_rgba(217,33,33,0.25)] opacity-0 will-change-transform">
-              <img 
-                src={SLIDES[2].image} 
-                alt="Hinchada Verdolaga en el Yankel" 
-                className="w-full h-full object-cover select-none pointer-events-none"
-              />
-            </div>
-          </div>
-          <div className="col flex flex-col justify-center md:order-2 order-1">
-            <div className="row-3-card card-box glass-card p-6 md:p-10 rounded-3xl border border-white/10 shadow-2xl space-y-4 max-w-[500px] mx-auto md:ml-0 opacity-0 will-change-transform">
-              <span className="text-marathon-lime font-bold tracking-[0.25em] text-xs uppercase block">
-                {SLIDES[1].category}
-              </span>
-              <h3 className="text-2xl md:text-3xl font-heading font-black text-white leading-tight uppercase">
-                {SLIDES[1].title}
-              </h3>
-              <p className="text-marathon-light/80 font-body text-sm md:text-base leading-relaxed">
-                {SLIDES[1].text}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Fila 4 (Tarjeta 3 a la izquierda, detalle a la derecha) */}
-        <div className="row grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center">
-          <div className="col flex flex-col justify-center">
-            <div className="row-4-card card-box glass-card p-6 md:p-10 rounded-3xl border border-white/10 shadow-2xl space-y-4 max-w-[500px] mx-auto md:mr-0 opacity-0 will-change-transform">
-              <span className="text-marathon-lime font-bold tracking-[0.25em] text-xs uppercase block">
-                {SLIDES[2].category}
-              </span>
-              <h3 className="text-2xl md:text-3xl font-heading font-black text-white leading-tight uppercase">
-                {SLIDES[2].title}
-              </h3>
-              <p className="text-marathon-light/80 font-body text-sm md:text-base leading-relaxed">
-                {SLIDES[2].text}
-              </p>
-            </div>
-          </div>
-          <div className="col flex justify-center items-center">
-            <div className="row-4-decor relative text-center p-8 border border-marathon-green/20 rounded-3xl bg-marathon-green/5 max-w-[360px] shadow-lg backdrop-blur-sm opacity-0 will-change-transform">
-              <Heart size={36} className="text-marathon-lime mx-auto mb-4 animate-pulse fill-marathon-lime" />
-              <h4 className="text-lg font-heading font-bold text-white mb-2 uppercase">Un sentimiento inmortal</h4>
-              <p className="text-xs text-marathon-light/60 leading-relaxed">
-                Cruzando generaciones desde 1925, latiendo más fuerte que nunca en la costa norte de Honduras.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Contenedor del trazo SVG de fondo animado (3 SVGs unidos armando la bandera tricolor real) */}
+        {/* Contenedor del trazo SVG de fondo animado (Garantizado por debajo de todo el contenido) */}
         <div className="svg-path absolute top-[3%] bottom-[3%] left-1/2 -translate-x-1/2 w-[90%] md:w-[94%] z-0 pointer-events-none">
           <svg
             viewBox="0 0 1378 2760"
@@ -317,6 +228,95 @@ export default function PassionSection() {
               className="opacity-60 filter drop-shadow-[0_0_8px_#FF3B30]"
             />
           </svg>
+        </div>
+
+        {/* Fila 1 (Imagen Histórica Centrada) */}
+        <div className="row relative z-10 flex justify-center items-center">
+          <div className="row-1-img img-wrapper relative z-10 w-full max-w-[650px] aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border border-white/10 filter drop-shadow-[0_15px_30px_rgba(14,114,29,0.25)] opacity-0 will-change-transform bg-black/80 backdrop-blur-sm">
+            <img 
+              src={SLIDES[0].image} 
+              alt="Club Deportivo Marathón 1925" 
+              className="w-full h-full object-cover select-none pointer-events-none"
+            />
+          </div>
+        </div>
+
+        {/* Fila 2 (Tarjeta 1 a la izquierda, Imagen 2 a la derecha) */}
+        <div className="row relative z-10 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center">
+          <div className="col flex flex-col justify-center">
+            <div className="row-2-card card-box relative z-10 glass-card bg-black/80 backdrop-blur-xl p-6 md:p-10 rounded-3xl border border-white/10 shadow-2xl space-y-4 max-w-[500px] mx-auto md:mr-0 opacity-0 will-change-transform">
+              <span className="text-marathon-lime font-bold tracking-[0.25em] text-xs uppercase block">
+                {SLIDES[0].category}
+              </span>
+              <h3 className="text-2xl md:text-3xl font-heading font-black text-white leading-tight uppercase">
+                {SLIDES[0].title}
+              </h3>
+              <p className="text-marathon-light/80 font-body text-sm md:text-base leading-relaxed">
+                {SLIDES[0].text}
+              </p>
+            </div>
+          </div>
+          <div className="col flex justify-center">
+            <div className="row-2-img img-wrapper relative z-10 w-full max-w-[480px] aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border border-white/10 filter drop-shadow-[0_15px_30px_rgba(255,255,255,0.15)] opacity-0 will-change-transform bg-black/80 backdrop-blur-sm">
+              <img 
+                src={SLIDES[1].image} 
+                alt="Celebración Plantel de Marathón" 
+                className="w-full h-full object-cover select-none pointer-events-none"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Fila 3 (Imagen 3 a la izquierda, Tarjeta 2 a la derecha) */}
+        <div className="row relative z-10 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center">
+          <div className="col flex justify-center md:order-1 order-2">
+            <div className="row-3-img img-wrapper relative z-10 w-full max-w-[480px] aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border border-white/10 filter drop-shadow-[0_15px_30px_rgba(217,33,33,0.25)] opacity-0 will-change-transform bg-black/80 backdrop-blur-sm">
+              <img 
+                src={SLIDES[2].image} 
+                alt="Hinchada Verdolaga en el Yankel" 
+                className="w-full h-full object-cover select-none pointer-events-none"
+              />
+            </div>
+          </div>
+          <div className="col flex flex-col justify-center md:order-2 order-1">
+            <div className="row-3-card card-box relative z-10 glass-card bg-black/80 backdrop-blur-xl p-6 md:p-10 rounded-3xl border border-white/10 shadow-2xl space-y-4 max-w-[500px] mx-auto md:ml-0 opacity-0 will-change-transform">
+              <span className="text-marathon-lime font-bold tracking-[0.25em] text-xs uppercase block">
+                {SLIDES[1].category}
+              </span>
+              <h3 className="text-2xl md:text-3xl font-heading font-black text-white leading-tight uppercase">
+                {SLIDES[1].title}
+              </h3>
+              <p className="text-marathon-light/80 font-body text-sm md:text-base leading-relaxed">
+                {SLIDES[1].text}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Fila 4 (Tarjeta 3 a la izquierda, detalle a la derecha) */}
+        <div className="row relative z-10 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center">
+          <div className="col flex flex-col justify-center">
+            <div className="row-4-card card-box relative z-10 glass-card bg-black/80 backdrop-blur-xl p-6 md:p-10 rounded-3xl border border-white/10 shadow-2xl space-y-4 max-w-[500px] mx-auto md:mr-0 opacity-0 will-change-transform">
+              <span className="text-marathon-lime font-bold tracking-[0.25em] text-xs uppercase block">
+                {SLIDES[2].category}
+              </span>
+              <h3 className="text-2xl md:text-3xl font-heading font-black text-white leading-tight uppercase">
+                {SLIDES[2].title}
+              </h3>
+              <p className="text-marathon-light/80 font-body text-sm md:text-base leading-relaxed">
+                {SLIDES[2].text}
+              </p>
+            </div>
+          </div>
+          <div className="col flex justify-center items-center">
+            <div className="row-4-decor relative z-10 text-center p-8 border border-marathon-green/20 rounded-3xl bg-marathon-darkest/90 backdrop-blur-xl max-w-[360px] shadow-lg opacity-0 will-change-transform">
+              <Heart size={36} className="text-marathon-lime mx-auto mb-4 animate-pulse fill-marathon-lime" />
+              <h4 className="text-lg font-heading font-bold text-white mb-2 uppercase">Un sentimiento inmortal</h4>
+              <p className="text-xs text-marathon-light/60 leading-relaxed">
+                Cruzando generaciones desde 1925, latiendo más fuerte que nunca en la costa norte de Honduras.
+              </p>
+            </div>
+          </div>
         </div>
 
       </div>

@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { gsap, ScrollTrigger } from "@/hooks/useGsap";
-import { Users, Trophy, ArrowRight, ChevronDown, Shield, Zap, Compass } from "lucide-react";
+import { gsap } from "@/hooks/useGsap";
+import { ArrowRight, ChevronDown, Trophy } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { CLUB } from "@/lib/constants";
 
@@ -10,61 +10,6 @@ import { CLUB } from "@/lib/constants";
 const TOTAL_FRAMES = 201;
 const FRAME_PATH = (n: number) =>
   `/assets/stadium/animation/ezgif-frame-${String(n).padStart(3, "0")}.jpg`;
-
-// ─── Animated Counter ─────────────────────────────────────────────────────────
-function AnimCounter({
-  target,
-  suffix = "",
-  prefix = "",
-  label,
-}: {
-  target: number;
-  suffix?: string;
-  prefix?: string;
-  label: string;
-}) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const hasRun = useRef(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
-    const st = ScrollTrigger.create({
-      trigger: el,
-      start: "top 85%",
-      onEnter: () => {
-        if (hasRun.current) return;
-        hasRun.current = true;
-        const obj = { val: 0 };
-        gsap.to(obj, {
-          val: target,
-          duration: 2.2,
-          ease: "power2.out",
-          onUpdate: () => {
-            if (ref.current)
-              ref.current.textContent = `${prefix}${Math.round(obj.val)}${suffix}`;
-          },
-        });
-      },
-    });
-    return () => st.kill();
-  }, [target, suffix, prefix]);
-
-  return (
-    <div className="text-center">
-      <span
-        ref={ref}
-        className="block text-4xl md:text-5xl font-heading font-black text-marathon-lime leading-none"
-      >
-        0
-      </span>
-      <span className="block text-xs uppercase tracking-[0.25em] text-white/50 mt-2 font-semibold">
-        {label}
-      </span>
-    </div>
-  );
-}
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function TemploSection() {
@@ -78,7 +23,7 @@ export default function TemploSection() {
   const preloadedImagesRef = useRef<HTMLImageElement[]>([]);
   const currentFrameRef = useRef<number>(1);
 
-  // ── 1. ASSET PRELOADING SEQUENCE (Runs strictly ONCE on mount) ────────────────
+  // ── 1. ASSET PRELOADING SEQUENCE ─────────────────────────────────────────────
   useEffect(() => {
     let isMounted = true;
     let loadedCount = 0;
@@ -89,28 +34,23 @@ export default function TemploSection() {
       img.onload = () => {
         if (!isMounted) return;
         loadedCount++;
-
         const progress = Math.round((loadedCount / TOTAL_FRAMES) * 100);
         setLoadingProgress(progress);
-
         if (loadedCount === TOTAL_FRAMES) {
           preloadedImagesRef.current = images;
           setIsLoaded(true);
         }
       };
-
       img.onerror = () => {
         if (!isMounted) return;
         loadedCount++;
         const progress = Math.round((loadedCount / TOTAL_FRAMES) * 100);
         setLoadingProgress(progress);
-
         if (loadedCount === TOTAL_FRAMES) {
           preloadedImagesRef.current = images;
           setIsLoaded(true);
         }
       };
-
       images.push(img);
       img.src = FRAME_PATH(i);
     }
@@ -120,7 +60,7 @@ export default function TemploSection() {
     };
   }, []);
 
-  // ── 2. GSAP SCROLL ANIMATION (Triggered once loading completes) ────────────────
+  // ── 2. GSAP SCROLL ANIMATION ─────────────────────────────────────────────────
   useEffect(() => {
     if (!isLoaded) return;
 
@@ -129,7 +69,6 @@ export default function TemploSection() {
     const pin = pinRef.current;
     if (!canvas || !container || !pin) return;
 
-    // Respect reduced-motion: draw a single static frame, skip scroll scrubbing.
     const prefersReduced = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches;
@@ -149,10 +88,8 @@ export default function TemploSection() {
       const imgHeight = img.naturalHeight || img.height;
 
       if (!canvas || !ctx || canvasWidth === 0 || canvasHeight === 0) return;
-
       if (imgWidth === 0 || imgHeight === 0) return;
 
-      // Clear previous frames cleanly
       ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
       const imgRatio = imgWidth / imgHeight;
@@ -174,13 +111,11 @@ export default function TemploSection() {
       ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
     };
 
-    // ── DYNAMIC RESIZING (Ensures crispness on Retina) ────────
+    // ── DYNAMIC RESIZING ──────────────────────────────────────
     const handleResize = () => {
       if (!canvas || !ctx) return;
       const dpr = window.devicePixelRatio || 1;
       const rect = canvas.getBoundingClientRect();
-
-      // Guard against collapsed 0-size rects during rendering/transitions
       if (rect.width === 0 || rect.height === 0) return;
 
       canvasWidth = rect.width;
@@ -193,12 +128,9 @@ export default function TemploSection() {
       drawFrame(currentFrameRef.current);
     };
 
-    // Initialize layout immediately
     handleResize();
-
     window.addEventListener("resize", handleResize);
 
-    // Reduced motion: show a representative static frame, skip pinning/scrub.
     if (prefersReduced) {
       currentFrameRef.current = 1;
       drawFrame(1);
@@ -211,7 +143,6 @@ export default function TemploSection() {
     const gsapCtx = gsap.context(() => {
       const frameObj = { frame: 1 };
 
-      // Pin viewport and coordinate timeline scrubbing
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: container,
@@ -227,7 +158,7 @@ export default function TemploSection() {
         },
       });
 
-      // 1. Frame Scrub animation (1 to 201)
+      // 1. Frame scrub (1 to 201)
       tl.to(
         frameObj,
         {
@@ -245,7 +176,7 @@ export default function TemploSection() {
         0
       );
 
-      // 2. FASE 1 (0–15%): Entrada - Title reveal
+      // 2. PHASE 1 (0–15%): Title reveal
       tl.fromTo(
         ".cueva-title",
         { opacity: 0, y: -40, clipPath: "inset(0 0 100% 0)" },
@@ -255,96 +186,35 @@ export default function TemploSection() {
       tl.fromTo(
         ".cueva-subtitle",
         { opacity: 0, letterSpacing: "0.6em" },
-        { opacity: 1, letterSpacing: "0.35em", duration: 0.12, ease: "power2.out" },
+        { opacity: 1, letterSpacing: "0.45em", duration: 0.12, ease: "power2.out" },
         0.05
       );
       tl.to(".cueva-scroll-hint", { opacity: 0, duration: 0.05 }, 0.10);
 
-      // 3. FASE 2 (15–50%): Revelación Progresiva - Badges slide-in
-      tl.fromTo(
-        ".reveal-structure",
-        { opacity: 0, x: -30 },
-        { opacity: 1, x: 0, duration: 0.1, ease: "back.out(1.5)" },
-        0.15
-      );
-      tl.fromTo(
-        ".reveal-tribunas",
-        { opacity: 0, x: 30 },
-        { opacity: 1, x: 0, duration: 0.1, ease: "back.out(1.5)" },
-        0.22
-      );
-      tl.fromTo(
-        ".reveal-cancha",
-        { opacity: 0, y: 30 },
-        { opacity: 1, y: 0, duration: 0.1, ease: "back.out(1.5)" },
-        0.30
-      );
-      tl.fromTo(
-        ".reveal-luces",
-        { opacity: 0, scale: 0.7 },
-        { opacity: 1, scale: 1, duration: 0.1, ease: "back.out(2)" },
-        0.38
-      );
-      tl.fromTo(
-        ".reveal-aficion",
-        { opacity: 0, y: -20 },
-        { opacity: 1, y: 0, duration: 0.1, ease: "back.out(1.5)" },
-        0.46
-      );
+      // 3. PHASE 2 (15–50%): Editorial panels
+      tl.fromTo(".reveal-structure", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.12, ease: "power3.out" }, 0.15);
+      tl.fromTo(".reveal-tribunas", { opacity: 0, x: 40 }, { opacity: 1, x: 0, duration: 0.12, ease: "power3.out" }, 0.22);
+      tl.fromTo(".reveal-cancha", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.10, ease: "power2.out" }, 0.30);
+      tl.fromTo(".reveal-luces", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.10, ease: "power2.out" }, 0.35);
+      tl.fromTo(".reveal-aficion", { opacity: 0 }, { opacity: 1, duration: 0.08 }, 0.40);
 
-      // 4. FASE 3 (50–75%): Epicentro - Badges clear out, counters appear
-      tl.to(
-        ".reveal-badges",
-        { opacity: 0, y: -20, duration: 0.08 },
-        0.50
-      );
-      tl.fromTo(
-        ".cueva-epicenter",
-        { opacity: 0, scale: 0.9 },
-        { opacity: 1, scale: 1, duration: 0.12, ease: "back.out(1.5)" },
-        0.53
-      );
-      tl.fromTo(
-        ".cueva-counters",
-        { opacity: 0, y: 40 },
-        { opacity: 1, y: 0, duration: 0.15, ease: "power2.out" },
-        0.56
-      );
-      tl.fromTo(
-        ".cueva-vignette",
-        { opacity: 0.4 },
-        { opacity: 0.75, duration: 0.2 },
-        0.50
-      );
-      // 5. FASE 4 (75–100%): Culminación - Exit transition & CTA
-      tl.to(".cueva-counters, .cueva-epicenter", { opacity: 0, y: -20, duration: 0.08 }, 0.75);
-      tl.fromTo(
-        ".cueva-cta-block",
-        { opacity: 0, y: 50, scale: 0.95 },
-        { opacity: 1, y: 0, scale: 1, duration: 0.15, ease: "back.out(1.8)" },
-        0.78
-      );
+      // 4. PHASE 3 (50–75%): Panels clear, scoreboard rises
+      tl.to(".reveal-badges", { opacity: 0, duration: 0.08 }, 0.50);
+      tl.fromTo(".cueva-counters", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.14, ease: "power3.out" }, 0.54);
+      tl.fromTo(".cueva-vignette", { opacity: 0.4 }, { opacity: 0.75, duration: 0.2 }, 0.50);
+
+      // 5. PHASE 4 (75–100%): Counters clear, CTA appears
+      tl.to(".cueva-counters", { opacity: 0, y: -20, duration: 0.08 }, 0.75);
+      tl.fromTo(".cueva-cta-block", { opacity: 0, y: 50, scale: 0.95 }, { opacity: 1, y: 0, scale: 1, duration: 0.15, ease: "back.out(1.8)" }, 0.78);
       tl.to(".cueva-title", { letterSpacing: "0.15em", duration: 0.15 }, 0.76);
-      tl.fromTo(
-        ".cueva-exit-fade",
-        { opacity: 0 },
-        { opacity: 1, duration: 0.06 },
-        0.95
-      );
+      tl.fromTo(".cueva-exit-fade", { opacity: 0 }, { opacity: 1, duration: 0.06 }, 0.95);
 
-      // Standalone infinite animations (run outside of the scroll-scrubbed timeline)
-      gsap.fromTo(
-        ".cueva-counter-item",
-        { y: 0 },
-        { y: -8, yoyo: true, repeat: -1, duration: 0.6, ease: "sine.inOut", stagger: 0.1 }
-      );
-
+      // Standalone infinite animation (outside the scrubbed timeline)
       gsap.fromTo(
         ".cueva-cta-glow",
         { opacity: 0.3, scale: 1 },
-        { opacity: 0.8, scale: 1.15, yoyo: true, repeat: -1, duration: 0.8, ease: "sine.inOut" }
+        { opacity: 0.7, scale: 1.12, yoyo: true, repeat: -1, duration: 1.2, ease: "sine.inOut" }
       );
-
     }, containerRef);
 
     return () => {
@@ -353,46 +223,44 @@ export default function TemploSection() {
     };
   }, [isLoaded]);
 
+  const YEARS_OF_PRIDE = new Date().getFullYear() - CLUB.founded;
+
   return (
     <>
       <style>{`
-        @keyframes glow-pulse {
-          0%, 100% { box-shadow: 0 0 20px 4px rgba(46, 156, 63, 0.4); }
-          50%       { box-shadow: 0 0 40px 10px rgba(146, 191, 78, 0.7); }
-        }
         @keyframes cueva-flicker {
           0%, 92%, 100% { opacity: 1; }
-          93% { opacity: 0.4; }
-          95% { opacity: 1; }
-          97% { opacity: 0.6; }
+          93%            { opacity: 0.4; }
+          95%            { opacity: 1; }
+          97%            { opacity: 0.6; }
         }
+        @keyframes spin { to { transform: rotate(360deg); } }
       `}</style>
 
-      {/* ── Scroll Container (400vh tracks the animation timeline) ── */}
+      {/* ── Scroll Container (400vh) ── */}
       <div
         ref={containerRef}
         className="relative w-full bg-black z-30"
         style={{ height: "400vh" }}
       >
-        {/* ── Sticky Viewport Pinned via GSAP (Double-pinned style) ── */}
-        <div ref={pinRef} className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between items-center">
+        {/* ── Sticky Viewport ── */}
+        <div ref={pinRef} className="sticky top-0 h-screen w-full overflow-hidden">
 
-          {/* ── Canvas: High Performance Frame Sequence Background ── */}
+          {/* Canvas */}
           <canvas
             ref={canvasRef}
-            className="absolute inset-0 w-full h-full object-cover z-0"
+            className="absolute inset-0 w-full h-full z-0"
             style={{ display: "block" }}
           />
 
-          {/* ── Dark overlay for readability ── */}
-          <div className="absolute inset-0 bg-black/45 z-[1] pointer-events-none" />
+          {/* Dark overlay */}
+          <div className="absolute inset-0 bg-black/40 z-[1] pointer-events-none" />
 
-          {/* ── Cinematic Vignette ── */}
+          {/* Cinematic Vignette */}
           <div
             className="cueva-vignette absolute inset-0 pointer-events-none z-[2]"
             style={{
-              background:
-                "radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.9) 100%)",
+              background: "radial-gradient(ellipse at center, transparent 28%, rgba(0,0,0,0.88) 100%)",
               opacity: 0.4,
             }}
           />
@@ -408,11 +276,10 @@ export default function TemploSection() {
                 />
                 <span className="text-sm font-heading font-black text-white">{loadingProgress}%</span>
               </div>
-              <p className="text-xs uppercase tracking-[0.4em] text-marathon-lime/70 font-semibold animate-pulse font-heading">
+              <p className="text-xs uppercase tracking-[0.4em] text-marathon-lime/70 font-semibold font-heading">
                 Abriendo las puertas…
               </p>
-              {/* Loading bar */}
-              <div className="mt-6 w-48 h-[2px] bg-white/10 rounded-full overflow-hidden">
+              <div className="mt-6 w-48 h-[2px] bg-white/10 overflow-hidden">
                 <div
                   className="h-full bg-marathon-lime transition-all duration-200 ease-out"
                   style={{ width: `${loadingProgress}%` }}
@@ -421,11 +288,12 @@ export default function TemploSection() {
             </div>
           )}
 
-          {/* ─────────────────────────────────────────────────────────────── */}
-          {/* ── PHASE 1 Content: Title ── */}
-          <div className="absolute top-[12%] inset-x-0 z-20 text-center px-4 pointer-events-none select-none">
+          {/* ──────────────────────────────────────────────── */}
+          {/* PHASE 1 — Title                                 */}
+          {/* ──────────────────────────────────────────────── */}
+          <div className="absolute top-[10%] inset-x-0 z-20 text-center px-4 pointer-events-none select-none">
             <p
-              className="cueva-subtitle text-[12px] font-semibold text-marathon-lime/80 mb-4"
+              className="cueva-subtitle text-[11px] font-heading font-semibold text-marathon-lime/70 tracking-[0.45em] uppercase mb-4"
               style={{ opacity: 0 }}
             >
               Estadio Yankel Rosenthal · San Pedro Sula
@@ -433,19 +301,16 @@ export default function TemploSection() {
             <h2
               className="cueva-title font-heading font-black text-white uppercase leading-none"
               style={{
-                fontSize: "clamp(2.2rem, 7vw, 6.5rem)",
+                fontSize: "clamp(2.4rem, 7.5vw, 7rem)",
                 opacity: 0,
-                textShadow: "0 0 60px rgba(46,156,63,0.4), 0 2px 40px rgba(0,0,0,0.8)",
-                letterSpacing: "0.08em",
+                textShadow: "0 0 80px rgba(46,156,63,0.35), 0 2px 40px rgba(0,0,0,0.9)",
+                letterSpacing: "0.06em",
                 animation: "cueva-flicker 8s 2s infinite",
               }}
             >
               BIENVENIDO A<br />
               <span
-                style={{
-                  WebkitTextStroke: "2px #92BF4E",
-                  color: "#92BF4E",
-                }}
+                style={{ WebkitTextStroke: "2px #92BF4E", color: "#92BF4E" }}
                 className="font-elrotex"
               >
                 LA CUEVA
@@ -455,160 +320,239 @@ export default function TemploSection() {
 
           {/* Scroll Hint */}
           <div className="cueva-scroll-hint absolute bottom-8 inset-x-0 z-20 flex flex-col items-center gap-2 pointer-events-none select-none">
-            <span className="text-[10px] tracking-[0.3em] text-white/40 uppercase font-heading">
+            <span className="text-[10px] tracking-[0.3em] text-white/35 uppercase font-heading">
               Scrollea para entrar
             </span>
-            <ChevronDown size={20} className="text-marathon-lime/60 animate-bounce" />
+            <ChevronDown size={20} className="text-marathon-lime/50 animate-bounce" />
           </div>
 
-          {/* ─────────────────────────────────────────────────────────────── */}
-          {/* ── PHASE 2 Reveal Badges ── */}
+          {/* ──────────────────────────────────────────────── */}
+          {/* PHASE 2 — Editorial Info Panels                 */}
+          {/* ──────────────────────────────────────────────── */}
           <div className="reveal-badges absolute inset-0 z-20 pointer-events-none select-none">
-            {/* Card 1: La Fortaleza (Left Top) */}
+
+            {/* TOP RULE — hairline with club label */}
             <div
-              className="reveal-structure absolute top-[18%] left-[4%] md:left-[8%] max-w-[280px] p-5 rounded-2xl border border-marathon-green/30 bg-black/80 backdrop-blur-md pointer-events-auto hover:border-marathon-lime hover:shadow-[0_0_25px_rgba(146,191,78,0.2)] transition-all duration-300 group"
+              className="reveal-aficion absolute top-0 inset-x-0 flex items-center px-8 md:px-14 pt-[4.5rem]"
               style={{ opacity: 0 }}
             >
-              <div className="flex items-center gap-2 mb-2">
-                <div className="p-1.5 rounded-lg bg-marathon-green/20 text-marathon-lime group-hover:bg-marathon-lime group-hover:text-black transition-colors duration-300">
-                  <Shield size={14} />
-                </div>
-                <span className="text-[10px] font-heading font-black text-marathon-lime tracking-[0.2em] uppercase">
-                  La Fortaleza
-                </span>
-              </div>
-              <h4 className="text-white font-heading font-black text-base uppercase tracking-wide">
-                YANKEL ROSENTHAL
-              </h4>
-              <p className="text-white/60 text-xs mt-1.5 font-body leading-relaxed">
-                El único estadio del país propiedad exclusiva de un club. Un fortín verde e inexpugnable.
-              </p>
+              <div className="flex-1 h-px bg-white/10" />
+              <span className="mx-5 text-[8px] font-heading font-black tracking-[0.55em] text-white/22 uppercase whitespace-nowrap">
+                Club Deportivo Marathón · Est. {CLUB.founded}
+              </span>
+              <div className="flex-1 h-px bg-white/10" />
             </div>
 
-            {/* Card 2: Iluminación Épica (Left Bottom) */}
+            {/* ── LEFT PANEL: Yankel Rosenthal ── */}
             <div
-              className="reveal-luces absolute bottom-[18%] left-[4%] md:left-[8%] max-w-[280px] p-5 rounded-2xl border border-yellow-500/20 bg-black/80 backdrop-blur-md pointer-events-auto hover:border-yellow-400 hover:shadow-[0_0_25px_rgba(234,179,8,0.2)] transition-all duration-300 group"
-              style={{ opacity: 0 }}
+              className="reveal-structure absolute top-1/2 left-0 -translate-y-1/2 pointer-events-auto"
+              style={{ opacity: 0, maxWidth: "clamp(190px, 22vw, 320px)" }}
             >
-              <div className="flex items-center gap-2 mb-2">
-                <div className="p-1.5 rounded-lg bg-yellow-500/10 text-yellow-400 group-hover:bg-yellow-400 group-hover:text-black transition-colors duration-300">
-                  <Zap size={14} />
+              <div className="flex">
+                {/* Lime left-edge accent bar */}
+                <div className="w-[3px] bg-marathon-lime self-stretch flex-shrink-0 mr-5 md:mr-6" />
+                <div className="py-8 pr-5">
+                  <p className="text-[8px] font-heading font-black tracking-[0.45em] text-marathon-lime/60 uppercase mb-3">
+                    01 — Propiedad
+                  </p>
+                  <h4
+                    className="font-heading font-black text-white uppercase"
+                    style={{ fontSize: "clamp(1.5rem, 2.8vw, 2.8rem)", lineHeight: 0.88 }}
+                  >
+                    YANKEL<br />
+                    <span className="text-marathon-lime">ROSENTHAL</span>
+                  </h4>
+                  <div className="mt-4 h-px bg-white/15 w-[85%]" />
+                  <p className="text-[11px] text-white/45 mt-3 font-body leading-relaxed max-w-[220px]">
+                    El único estadio del país propiedad exclusiva de un club. Fortaleza inexpugnable desde 2010.
+                  </p>
                 </div>
-                <span className="text-[10px] font-heading font-black text-yellow-400 tracking-[0.2em] uppercase">
-                  Iluminación
-                </span>
               </div>
-              <h4 className="text-white font-heading font-black text-base uppercase tracking-wide">
-                NOCHES MÁGICAS
-              </h4>
-              <p className="text-white/60 text-xs mt-1.5 font-body leading-relaxed">
-                Sistema de torres de iluminación LED de última generación para disputar batallas estelares bajo la luna.
-              </p>
             </div>
 
-            {/* Card 3: Cancha Sagrada (Right Top) */}
+            {/* ── RIGHT PANEL: Capacidad — editorial giant numeral ── */}
             <div
-              className="reveal-cancha absolute top-[18%] right-[4%] md:right-[8%] max-w-[280px] p-5 rounded-2xl border border-marathon-green/30 bg-black/80 backdrop-blur-md pointer-events-auto hover:border-marathon-lime hover:shadow-[0_0_25px_rgba(146,191,78,0.2)] transition-all duration-300 group"
-              style={{ opacity: 0 }}
+              className="reveal-tribunas absolute top-1/2 right-0 -translate-y-1/2 pointer-events-auto text-right"
+              style={{ opacity: 0, maxWidth: "clamp(190px, 22vw, 320px)" }}
             >
-              <div className="flex items-center gap-2 mb-2">
-                <div className="p-1.5 rounded-lg bg-marathon-green/20 text-marathon-lime group-hover:bg-marathon-lime group-hover:text-black transition-colors duration-300">
-                  <Compass size={14} />
+              <div className="flex flex-row-reverse">
+                {/* Lime right-edge accent bar */}
+                <div className="w-[3px] bg-marathon-lime self-stretch flex-shrink-0 ml-5 md:ml-6" />
+                <div className="py-8 pl-5">
+                  <p className="text-[8px] font-heading font-black tracking-[0.45em] text-marathon-lime/60 uppercase mb-1">
+                    02 — Capacidad
+                  </p>
+                  {/* Oversized numeral — the typographic hero */}
+                  <div
+                    className="font-heading font-black text-white"
+                    style={{ fontSize: "clamp(3.5rem, 7.5vw, 6.5rem)", lineHeight: 0.82 }}
+                  >
+                    9K
+                  </div>
+                  <div className="mt-3 h-px bg-white/15 w-full" />
+                  <p className="text-[11px] text-white/45 mt-3 font-body leading-relaxed max-w-[220px] ml-auto">
+                    Nueve mil voces que rugen como una sola. La Cueva que tiembla.
+                  </p>
                 </div>
-                <span className="text-[10px] font-heading font-black text-marathon-lime tracking-[0.2em] uppercase">
-                  Grama Natural
-                </span>
               </div>
-              <h4 className="text-white font-heading font-black text-base uppercase tracking-wide">
-                ALFOMBRA VERDE
-              </h4>
-              <p className="text-white/60 text-xs mt-1.5 font-body leading-relaxed">
-                Césped natural de alta resistencia, mimado bajo estándares deportivos de alto rendimiento internacional.
-              </p>
             </div>
 
-            {/* Card 4: La Hinchada (Right Bottom) */}
+            {/* ── BOTTOM-LEFT: Superficie ── */}
             <div
-              className="reveal-aficion absolute bottom-[18%] right-[4%] md:right-[8%] max-w-[280px] p-5 rounded-2xl border border-marathon-green/30 bg-black/80 backdrop-blur-md pointer-events-auto hover:border-marathon-lime hover:shadow-[0_0_25px_rgba(146,191,78,0.2)] transition-all duration-300 group"
-              style={{ opacity: 0 }}
+              className="reveal-cancha absolute bottom-0 left-0 pointer-events-auto"
+              style={{ opacity: 0, maxWidth: "clamp(170px, 21vw, 300px)" }}
             >
-              <div className="flex items-center gap-2 mb-2">
-                <div className="p-1.5 rounded-lg bg-marathon-green/20 text-marathon-lime group-hover:bg-marathon-lime group-hover:text-black transition-colors duration-300">
-                  <Users size={14} />
-                </div>
-                <span className="text-[10px] font-heading font-black text-marathon-lime tracking-[0.2em] uppercase">
-                  El Jugador 12
-                </span>
+              <div className="border-t border-white/12 pt-4 pb-5 pl-6 pr-4">
+                <p className="text-[8px] font-heading font-black tracking-[0.45em] text-marathon-lime/60 uppercase mb-2">
+                  03 — Superficie
+                </p>
+                <h4
+                  className="font-heading font-black text-white uppercase"
+                  style={{ fontSize: "clamp(1.1rem, 1.9vw, 1.6rem)", lineHeight: 0.9 }}
+                >
+                  CÉSPED<br />NATURAL
+                </h4>
+                <p className="text-[10px] text-white/40 mt-2 font-body leading-relaxed">
+                  Estándares deportivos internacionales de alto rendimiento.
+                </p>
               </div>
-              <h4 className="text-white font-heading font-black text-base uppercase tracking-wide">
-                FURIA VERDE
-              </h4>
-              <p className="text-white/60 text-xs mt-1.5 font-body leading-relaxed">
-                Nuestra afición ruge en cada tribuna. Su aliento incondicional transforma el estadio en un verdadero hervidero.
-              </p>
             </div>
+
+            {/* ── BOTTOM-RIGHT: Fundación ── */}
+            <div
+              className="reveal-luces absolute bottom-0 right-0 pointer-events-auto text-right"
+              style={{ opacity: 0, maxWidth: "clamp(170px, 21vw, 300px)" }}
+            >
+              <div className="border-t border-white/12 pt-4 pb-5 pr-6 pl-4">
+                <p className="text-[8px] font-heading font-black tracking-[0.45em] text-marathon-lime/60 uppercase mb-2">
+                  04 — Fundación
+                </p>
+                {/* Year as outlined typographic hero */}
+                <div
+                  className="font-heading font-black leading-none"
+                  style={{
+                    fontSize: "clamp(1.9rem, 3.8vw, 3.2rem)",
+                    lineHeight: 0.88,
+                    color: "transparent",
+                    WebkitTextStroke: "1.5px #92BF4E",
+                  }}
+                >
+                  {CLUB.founded}
+                </div>
+                <p className="text-[10px] text-white/40 mt-2 font-body leading-relaxed">
+                  Un siglo de historia verde en Honduras.
+                </p>
+              </div>
+            </div>
+
           </div>
 
-          {/* ─────────────────────────────────────────────────────────────── */}
-          {/* ── PHASE 3 Epicenter + Counters ── */}
+          {/* ──────────────────────────────────────────────── */}
+          {/* PHASE 3 — Stats Scoreboard (bottom-anchored)    */}
+          {/* ──────────────────────────────────────────────── */}
           <div
-            className="cueva-counters absolute top-[52%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-[92%] max-w-[850px] p-6 md:p-10 rounded-2xl border border-marathon-lime/20 bg-black/85 backdrop-blur-xl pointer-events-auto select-none shadow-[0_0_50px_rgba(0,0,0,0.8),0_0_30px_rgba(146,191,78,0.08)] flex flex-col justify-center"
+            className="cueva-counters absolute bottom-0 inset-x-0 z-20 pointer-events-auto select-none"
             style={{ opacity: 0 }}
           >
-            <div className="text-center mb-6">
-              <span className="text-[10px] uppercase tracking-[0.35em] text-marathon-lime font-black px-3 py-1 rounded-full bg-marathon-lime/10 border border-marathon-lime/20">
+            {/* Hairline rule with label */}
+            <div className="flex items-center px-6 md:px-10">
+              <div className="flex-1 h-px bg-marathon-lime/30" />
+              <span className="mx-5 text-[8px] font-heading font-black tracking-[0.55em] text-marathon-lime/55 uppercase whitespace-nowrap">
                 Estadísticas del Club
               </span>
-              <h3 className="text-xl md:text-2xl font-heading font-black text-white uppercase mt-3 tracking-wider">
-                NUESTRO PODER EN NÚMEROS
-              </h3>
+              <div className="flex-1 h-px bg-marathon-lime/30" />
             </div>
-            
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-4 divide-y md:divide-y-0 md:divide-x divide-white/5">
-              <div className="cueva-counter-item px-4 text-center py-4 md:py-0">
-                <AnimCounter
-                  target={new Date().getFullYear() - CLUB.founded}
-                  suffix="+"
-                  label="Años de Orgullo"
-                />
-              </div>
-              <div className="cueva-counter-item px-4 text-center py-4 md:py-0">
-                <AnimCounter target={CLUB.titles} label="Títulos de Liga" />
-              </div>
-              <div className="cueva-counter-item px-4 text-center py-4 md:py-0">
-                <AnimCounter target={50} suffix="K+" label="Seguidores" />
-              </div>
-              <div className="cueva-counter-item px-4 text-center py-4 md:py-0">
-                <AnimCounter target={9000} label="Capacidad de Cueva" />
-              </div>
+
+            {/* 4-cell scoreboard grid */}
+            <div
+              className="grid grid-cols-4 bg-black/75 backdrop-blur-xl"
+              style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}
+            >
+              {[
+                { num: `${YEARS_OF_PRIDE}`, suf: "+", label: "Años de\nOrgullo", accent: false },
+                { num: `${CLUB.titles}`, suf: "×", label: "Títulos\nde Liga", accent: true },
+                { num: "50K", suf: "+", label: "Seguidores\nen Redes", accent: false },
+                { num: "9,000", suf: "", label: "Capacidad\nLa Cueva", accent: false },
+              ].map((stat, i) => (
+                <div
+                  key={i}
+                  className="cueva-counter-item relative px-4 md:px-7 lg:px-10 py-5 md:py-7"
+                  style={{ borderRight: i < 3 ? "1px solid rgba(255,255,255,0.07)" : "none" }}
+                >
+                  {/* Index number */}
+                  <span className="absolute top-2.5 right-3 text-[7px] font-heading font-black text-white/15 tracking-widest">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+
+                  {/* Lime top accent bar on the titles column */}
+                  {stat.accent && (
+                    <div className="absolute top-0 left-0 right-0 h-[2px] bg-marathon-lime" />
+                  )}
+
+                  {/* Big number */}
+                  <div className="flex items-end gap-0.5 leading-none">
+                    <span
+                      className="font-heading font-black text-white"
+                      style={{ fontSize: "clamp(1.8rem, 3.8vw, 3.4rem)", lineHeight: 1 }}
+                    >
+                      {stat.num}
+                    </span>
+                    {stat.suf && (
+                      <span
+                        className="font-heading font-black text-marathon-lime pb-0.5"
+                        style={{ fontSize: "clamp(1rem, 2vw, 1.8rem)", lineHeight: 1 }}
+                      >
+                        {stat.suf}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Label */}
+                  <p
+                    className="text-white/35 font-heading font-semibold uppercase mt-1.5"
+                    style={{
+                      fontSize: "clamp(0.52rem, 0.85vw, 0.68rem)",
+                      letterSpacing: "0.2em",
+                      whiteSpace: "pre-line",
+                    }}
+                  >
+                    {stat.label}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* ─────────────────────────────────────────────────────────────── */}
-          {/* ── PHASE 4 CTA Block ── */}
+          {/* ──────────────────────────────────────────────── */}
+          {/* PHASE 4 — CTA Block                             */}
+          {/* ──────────────────────────────────────────────── */}
           <div
-            className="cueva-cta-block absolute inset-0 z-30 flex flex-col items-center justify-end pb-[12%] pointer-events-none select-none"
+            className="cueva-cta-block absolute inset-0 z-30 flex flex-col items-center justify-end pb-[10%] pointer-events-none select-none"
             style={{ opacity: 0 }}
           >
-            {/* CTA Glow Aura */}
             <div
-              className="cueva-cta-glow absolute bottom-[8%] w-64 h-32 rounded-full bg-marathon-green/20 blur-[60px] pointer-events-none"
+              className="cueva-cta-glow absolute bottom-[7%] w-72 h-36 rounded-full bg-marathon-green/15 blur-[70px] pointer-events-none"
               style={{ opacity: 0.3 }}
             />
 
             <div className="text-center mb-8 px-4">
-              <p className="text-white/50 text-sm font-heading tracking-[0.3em] uppercase mb-2">
+              <p className="text-white/40 text-xs font-heading tracking-[0.45em] uppercase mb-3">
                 Más que un estadio
               </p>
-              <h3 className="text-3xl md:text-5xl font-heading font-black text-white uppercase leading-tight">
+              <h3
+                className="font-heading font-black text-white uppercase"
+                style={{ fontSize: "clamp(2rem, 5vw, 4.5rem)", lineHeight: 0.92 }}
+              >
                 TU CASA,{" "}
-                <span className="text-marathon-lime" style={{ filter: "drop-shadow(0 0 12px #92BF4E)" }}>
+                <span
+                  className="text-marathon-lime"
+                  style={{ filter: "drop-shadow(0 0 18px rgba(146,191,78,0.55))" }}
+                >
                   TU CUEVA
                 </span>
               </h3>
-              <p className="text-white/40 text-sm mt-3 max-w-md mx-auto font-body leading-relaxed">
-                Primer estadio propio de un club hondureño. Inaugurado en 2010.
-                Fortaleza inexpugnable en San Pedro Sula.
+              <p className="text-white/35 text-sm mt-4 max-w-sm mx-auto font-body leading-relaxed">
+                Primer estadio propio de un club hondureño. Inaugurado en 2010. Fortaleza en San Pedro Sula.
               </p>
             </div>
 
@@ -624,11 +568,12 @@ export default function TemploSection() {
             </div>
           </div>
 
-          {/* ── Exit fade overlay (smooth transition to next section) ── */}
+          {/* Exit fade */}
           <div
             className="cueva-exit-fade absolute inset-0 bg-black pointer-events-none z-40"
             style={{ opacity: 0 }}
           />
+
         </div>
       </div>
     </>
