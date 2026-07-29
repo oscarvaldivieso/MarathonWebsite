@@ -13,12 +13,12 @@ export const metadata: Metadata = {
     template: "%s | CD Marathón",
   },
   icons: {
-    icon: "/assets/brand/escudocentenario_color.svg",
-    apple: "/assets/brand/escudocentenario_color.svg",
-    shortcut: "/assets/brand/escudocentenario_color.svg",
+    icon: "/assets/brand/escudo_normal.svg",
+    apple: "/assets/brand/escudo_normal.svg",
+    shortcut: "/assets/brand/escudo_normal.svg",
     other: {
       rel: "apple-touch-icon-precomposed",
-      url: "/assets/brand/escudocentenario_color.svg",
+      url: "/assets/brand/escudo_normal.svg",
     },
   },
   description:
