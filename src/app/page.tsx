@@ -1,6 +1,6 @@
 import HeroSection from "@/components/home/HeroSection";
-import UpcomingMatchesSection from "@/components/home/UpcomingMatchesSection";
 import TemploSection from "@/components/home/TemploSection";
+import UpcomingMatchesSection from "@/components/home/UpcomingMatchesSection";
 import StatsSection from "@/components/home/StatsSection";
 import FeaturedPlayersSection from "@/components/home/FeaturedPlayersSection";
 import NewsPreviewSection from "@/components/home/NewsPreviewSection";
@@ -10,33 +10,32 @@ import CtaSection from "@/components/home/CtaSection";
 export default function HomePage() {
   return (
     <div className="relative w-full">
-      {/* 1. HERO SECTION (Fijado en el fondo) */}
+      {/* Capa 1: Hero Section fijada en el fondo */}
       <div className="sticky top-0 h-screen w-full z-10 overflow-hidden">
         <HeroSection />
       </div>
 
-      {/* Capa de Contenido Principal que asciende en scroll */}
+      {/* Capa 2: Contenido principal superpuesto que cubre el Hero limpiamente con el Templo */}
       <div className="relative z-20 bg-marathon-darkest shadow-[0_-30px_90px_rgba(0,0,0,0.95)] border-t border-white/10">
-        
-        {/* 2. PRÓXIMOS PARTIDOS / MATCHDAY HUB (Acción y Utilidad Inmediata) */}
-        <UpcomingMatchesSection />
-
-        {/* 3. EL TEMPLO DEL MONSTRUO VERDE (WOW Factor Visual — Estadio) */}
+        {/* 1. Transición de superposición fluida: Templo del Monstruo Verde */}
         <TemploSection />
 
-        {/* 4. LA GRANDEZA EN NÚMEROS / STATS (Credibilidad e Historia) */}
+        {/* 2. Próximos Partidos (Carrusel Horizontal limpio e independiente) */}
+        <UpcomingMatchesSection />
+
+        {/* 3. La Grandeza en Números (Bento Grid Estilo Apple) */}
         <StatsSection />
 
-        {/* 5. JUGADORES DESTACADOS / ESTRELLAS (Conexión Humana) */}
+        {/* 4. Jugadores Destacados */}
         <FeaturedPlayersSection />
 
-        {/* 6. ACTUALIDAD Y NOTICIAS (Contenido Dinámico y Retención) */}
+        {/* 5. Noticias Recientes */}
         <NewsPreviewSection />
 
-        {/* 7. PASIÓN Y VOZ DEL HINCHA (Comunidad y Pertenencia) */}
+        {/* 6. Pasión Verdolaga */}
         <PassionSection />
 
-        {/* 8. CTA DE CONVERSIÓN Y COMUNIDAD (Cierre) */}
+        {/* 7. CTA de Conversión */}
         <CtaSection />
       </div>
     </div>
