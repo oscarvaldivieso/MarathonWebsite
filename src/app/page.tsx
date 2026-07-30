@@ -6,7 +6,6 @@ import FeaturedPlayersSection from "@/components/home/FeaturedPlayersSection";
 import NewsPreviewSection from "@/components/home/NewsPreviewSection";
 import PassionSection from "@/components/home/PassionSection";
 import CtaSection from "@/components/home/CtaSection";
-import ColorTransition from "@/components/ui/ColorTransition";
 
 export default function HomePage() {
   return (
@@ -25,26 +24,8 @@ export default function HomePage() {
         {/* 3. EL TEMPLO DEL MONSTRUO VERDE (WOW Factor Visual — Estadio) */}
         <TemploSection />
 
-        {/* Transición Oscuro → Claro a Estadísticas */}
-        <ColorTransition
-          from="#012919"
-          to="#F3F3F3"
-          accentColor="#92BF4E"
-          text="MARATHON"
-          height="200px"
-        />
-
         {/* 4. LA GRANDEZA EN NÚMEROS / STATS (Credibilidad e Historia) */}
         <StatsSection />
-
-        {/* Transición Claro → Oscuro a Jugadores */}
-        <ColorTransition
-          from="#F3F3F3"
-          to="#012919"
-          accentColor="#2E9C3F"
-          text="FURIA VERDE"
-          height="200px"
-        />
 
         {/* 5. JUGADORES DESTACADOS / ESTRELLAS (Conexión Humana) */}
         <FeaturedPlayersSection />
