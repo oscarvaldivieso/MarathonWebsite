@@ -55,6 +55,28 @@ export const metadata: Metadata = {
   },
 };
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SportsTeam",
+  name: "Club Deportivo Marathón",
+  sport: "Soccer",
+  foundingDate: "1925-11-25",
+  location: {
+    "@type": "Place",
+    name: "Estadio Yankel Rosenthal",
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "San Pedro Sula",
+      addressCountry: "HN",
+    },
+  },
+  memberOf: {
+    "@type": "SportsOrganization",
+    name: "Liga Nacional de Fútbol de Honduras",
+  },
+  url: "https://cdmarathon.com",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -69,6 +91,10 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@100..700&display=swap" rel="stylesheet" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
       </head>
       <body className="min-h-full flex flex-col bg-marathon-darkest text-marathon-light">
         <SmoothScroll />

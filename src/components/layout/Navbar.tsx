@@ -51,16 +51,25 @@ export default function Navbar() {
           {/* Logo - Left */}
           <motion.a
             href="/"
-            className="relative z-10 flex items-center gap-2 group"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            className="relative z-10 flex items-center gap-3 group"
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
           >
             <img
               src="/assets/brand/escudonormal_blanco.svg"
               alt="CD Marathón"
               className={cn(
                 "transition-all duration-300",
-                isScrolled ? "h-12 w-12" : "h-16 w-16"
+                isScrolled ? "h-11 w-11" : "h-14 w-14"
+              )}
+            />
+            {/* Insignia conmemorativa de Centenario (solo en desktop) */}
+            <img
+              src="/assets/brand/centenario.png"
+              alt="Centenario CD Marathón"
+              className={cn(
+                "hidden lg:block transition-all duration-300 object-contain drop-shadow-sm",
+                isScrolled ? "h-9 w-auto" : "h-12 w-auto"
               )}
             />
           </motion.a>

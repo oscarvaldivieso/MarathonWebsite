@@ -1,62 +1,51 @@
 import HeroSection from "@/components/home/HeroSection";
-import HeroPortalTransition from "@/components/home/HeroPortalTransition";
-import PortalSection from "@/components/home/PortalSection";
 import TemploSection from "@/components/home/TemploSection";
+import UpcomingMatchesSection from "@/components/home/UpcomingMatchesSection";
 import StatsSection from "@/components/home/StatsSection";
-import HistoryPreview from "@/components/home/HistoryPreview";
-import MatchdaySection from "@/components/home/MatchdaySection";
+import FeaturedPlayersSection from "@/components/home/FeaturedPlayersSection";
+import NewsPreviewSection from "@/components/home/NewsPreviewSection";
 import PassionSection from "@/components/home/PassionSection";
 import CtaSection from "@/components/home/CtaSection";
 import ColorTransition from "@/components/ui/ColorTransition";
 
 export default function HomePage() {
   return (
-    <>
-      <HeroSection />
-      <HeroPortalTransition />
-      <PortalSection />
-      <TemploSection />
+    <div className="relative w-full">
+      {/* Capa 1: Hero Section fijada en el fondo */}
+      <div className="sticky top-0 h-screen w-full z-10 overflow-hidden">
+        <HeroSection />
+      </div>
 
-      {/* Dark → Light transition into Stats */}
-      <ColorTransition 
-        from="#000000" 
-        to="#F3F3F3" 
-        accentColor="#92BF4E" 
-        text="TEMPLO" 
-        height="280px" 
-      />
-      <StatsSection />
+      {/* Capa 2: Contenido principal superpuesto en scroll */}
+      <div className="relative z-20 bg-marathon-darkest shadow-[0_-30px_90px_rgba(0,0,0,0.95)] border-t border-white/10">
+        <TemploSection />
 
-      {/* Light → Dark transition into History */}
-      <ColorTransition 
-        from="#F3F3F3" 
-        to="#012919" 
-        accentColor="#2E9C3F" 
-        text="LEYENDA" 
-        height="280px" 
-      />
-      <HistoryPreview />
+        <UpcomingMatchesSection />
 
-      {/* Dark → Light transition into Matchday */}
-      <ColorTransition 
-        from="#012919" 
-        to="#F3F3F3" 
-        accentColor="#92BF4E" 
-        text="PARTIDO" 
-        height="280px" 
-      />
-      <MatchdaySection />
+        {/* Dark → Light transition into Stats */}
+        <ColorTransition
+          from="#012919"
+          to="#F3F3F3"
+          accentColor="#92BF4E"
+          text="MARATHON"
+          height="220px"
+        />
+        <StatsSection />
 
-      {/* Light → Dark transition into Passion */}
-      <ColorTransition 
-        from="#F3F3F3" 
-        to="#01402E" 
-        accentColor="#2E9C3F" 
-        text="PASION" 
-        height="280px" 
-      />
-      <PassionSection />
-      <CtaSection />
-    </>
+        {/* Light → Dark transition into Players */}
+        <ColorTransition
+          from="#F3F3F3"
+          to="#012919"
+          accentColor="#2E9C3F"
+          text="FURIA VERDE"
+          height="220px"
+        />
+
+        <FeaturedPlayersSection />
+        <NewsPreviewSection />
+        <PassionSection />
+        <CtaSection />
+      </div>
+    </div>
   );
 }

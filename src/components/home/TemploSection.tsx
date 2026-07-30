@@ -76,55 +76,55 @@ export default function TemploSection() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    let canvasWidth = 0;
-    let canvasHeight = 0;
-
-    // ── DRAWING LOGIC (Object-Cover canvas scaling) ───────────
+    // ── LOGICA DE DIBUJO CON ASPECT RATIO PERFECTO (Object-Cover) ───────────
     const drawFrame = (frameIndex: number) => {
       const img = preloadedImagesRef.current[frameIndex - 1];
-      if (!img) return;
+      if (!img || !canvas || !ctx) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const cssWidth = rect.width;
+      const cssHeight = rect.height;
+      if (cssWidth === 0 || cssHeight === 0) return;
 
       const imgWidth = img.naturalWidth || img.width;
       const imgHeight = img.naturalHeight || img.height;
+      if (!imgWidth || !imgHeight) return;
 
-      if (!canvas || !ctx || canvasWidth === 0 || canvasHeight === 0) return;
-      if (imgWidth === 0 || imgHeight === 0) return;
+      // Ajustar resolución retina DPR manteniendo coordenadas limpias
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const targetWidth = Math.round(cssWidth * dpr);
+      const targetHeight = Math.round(cssHeight * dpr);
 
-      ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+      if (canvas.width !== targetWidth || canvas.height !== targetHeight) {
+        canvas.width = targetWidth;
+        canvas.height = targetHeight;
+      }
 
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Cálculo estricto de Object-Cover para evitar cualquier distorsión de aspecto
       const imgRatio = imgWidth / imgHeight;
-      const canvasRatio = canvasWidth / canvasHeight;
+      const canvasRatio = canvas.width / canvas.height;
 
-      let drawWidth = canvasWidth;
-      let drawHeight = canvasHeight;
+      let drawWidth = canvas.width;
+      let drawHeight = canvas.height;
       let offsetX = 0;
       let offsetY = 0;
 
       if (canvasRatio > imgRatio) {
-        drawHeight = canvasWidth / imgRatio;
-        offsetY = (canvasHeight - drawHeight) / 2;
+        drawHeight = canvas.width / imgRatio;
+        offsetY = (canvas.height - drawHeight) / 2;
       } else {
-        drawWidth = canvasHeight * imgRatio;
-        offsetX = (canvasWidth - drawWidth) / 2;
+        drawWidth = canvas.height * imgRatio;
+        offsetX = (canvas.width - drawWidth) / 2;
       }
 
       ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
     };
 
-    // ── DYNAMIC RESIZING ──────────────────────────────────────
+    // ── RESIZE HANDLER ──────────────────────────────────────
     const handleResize = () => {
-      if (!canvas || !ctx) return;
-      const dpr = window.devicePixelRatio || 1;
-      const rect = canvas.getBoundingClientRect();
-      if (rect.width === 0 || rect.height === 0) return;
-
-      canvasWidth = rect.width;
-      canvasHeight = rect.height;
-
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
-      ctx.scale(dpr, dpr);
-
       drawFrame(currentFrameRef.current);
     };
 
@@ -209,12 +209,14 @@ export default function TemploSection() {
       tl.to(".cueva-title", { letterSpacing: "0.15em", duration: 0.15 }, 0.76);
       tl.fromTo(".cueva-exit-fade", { opacity: 0 }, { opacity: 1, duration: 0.06 }, 0.95);
 
-      // Standalone infinite animation (outside the scrubbed timeline)
-      gsap.fromTo(
-        ".cueva-cta-glow",
-        { opacity: 0.3, scale: 1 },
-        { opacity: 0.7, scale: 1.12, yoyo: true, repeat: -1, duration: 1.2, ease: "sine.inOut" }
-      );
+      // Standalone ambient animation (subtle and clean)
+      gsap.to(".cueva-vignette", {
+        opacity: 0.65,
+        duration: 2,
+        repeat: -1,
+        yoyo: true,
+        ease: "sine.inOut",
+      });
     }, containerRef);
 
     return () => {
@@ -228,20 +230,15 @@ export default function TemploSection() {
   return (
     <>
       <style>{`
-        @keyframes cueva-flicker {
-          0%, 92%, 100% { opacity: 1; }
-          93%            { opacity: 0.4; }
-          95%            { opacity: 1; }
-          97%            { opacity: 0.6; }
-        }
         @keyframes spin { to { transform: rotate(360deg); } }
       `}</style>
 
-      {/* ── Scroll Container (400vh) ── */}
+      {/* ── Scroll Container (200vh — optimizado) ── */}
       <div
+        id="templo"
         ref={containerRef}
-        className="relative w-full bg-black z-30"
-        style={{ height: "400vh" }}
+        className="relative w-full bg-marathon-darkest z-30"
+        style={{ height: "200vh" }}
       >
         {/* ── Sticky Viewport ── */}
         <div ref={pinRef} className="sticky top-0 h-screen w-full overflow-hidden">
@@ -253,33 +250,34 @@ export default function TemploSection() {
             style={{ display: "block" }}
           />
 
-          {/* Dark overlay */}
-          <div className="absolute inset-0 bg-black/40 z-[1] pointer-events-none" />
+          {/* Dark gradient overlays */}
+          <div className="absolute inset-0 bg-marathon-darkest/50 z-[1] pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-b from-marathon-darkest via-transparent to-marathon-darkest/90 z-[1] pointer-events-none" />
 
-          {/* Cinematic Vignette */}
+          {/* Subtle Vignette */}
           <div
             className="cueva-vignette absolute inset-0 pointer-events-none z-[2]"
             style={{
-              background: "radial-gradient(ellipse at center, transparent 28%, rgba(0,0,0,0.88) 100%)",
-              opacity: 0.4,
+              background: "radial-gradient(ellipse at center, transparent 35%, rgba(1, 23, 14, 0.92) 100%)",
+              opacity: 0.5,
             }}
           />
 
           {/* ── Loading HUD ── */}
           {!isLoaded && (
-            <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/90 backdrop-blur-md">
-              <div className="relative w-24 h-24 flex items-center justify-center mb-8">
-                <div className="absolute inset-0 rounded-full border-4 border-marathon-green/10" />
+            <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-marathon-darkest/95 backdrop-blur-md">
+              <div className="relative w-20 h-20 flex items-center justify-center mb-6">
+                <div className="absolute inset-0 rounded-full border-2 border-marathon-green/20" />
                 <div
-                  className="absolute inset-0 rounded-full border-4 border-t-marathon-lime border-r-transparent border-b-transparent border-l-transparent"
+                  className="absolute inset-0 rounded-full border-2 border-t-marathon-lime border-r-transparent border-b-transparent border-l-transparent"
                   style={{ animation: "spin 1s linear infinite" }}
                 />
-                <span className="text-sm font-heading font-black text-white">{loadingProgress}%</span>
+                <span className="text-xs font-heading font-bold text-white">{loadingProgress}%</span>
               </div>
-              <p className="text-xs uppercase tracking-[0.4em] text-marathon-lime/70 font-semibold font-heading">
-                Abriendo las puertas…
+              <p className="text-[11px] font-heading font-medium tracking-[0.25em] text-marathon-lime/80 uppercase">
+                Cargando el templo verde...
               </p>
-              <div className="mt-6 w-48 h-[2px] bg-white/10 overflow-hidden">
+              <div className="mt-4 w-40 h-[2px] bg-white/10 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-marathon-lime transition-all duration-200 ease-out"
                   style={{ width: `${loadingProgress}%` }}
@@ -289,288 +287,187 @@ export default function TemploSection() {
           )}
 
           {/* ──────────────────────────────────────────────── */}
-          {/* PHASE 1 — Title                                 */}
+          {/* FASE 1 — Título Principal                        */}
           {/* ──────────────────────────────────────────────── */}
-          <div className="absolute top-[10%] inset-x-0 z-20 text-center px-4 pointer-events-none select-none">
+          <div className="absolute top-[12%] inset-x-0 z-20 text-center px-4 pointer-events-none select-none">
             <p
-              className="cueva-subtitle text-[11px] font-heading font-semibold text-marathon-lime/70 tracking-[0.45em] uppercase mb-4"
+              className="cueva-subtitle text-[11px] sm:text-xs font-heading font-medium text-marathon-lime tracking-[0.3em] uppercase mb-3"
               style={{ opacity: 0 }}
             >
               Estadio Yankel Rosenthal · San Pedro Sula
             </p>
             <h2
-              className="cueva-title font-heading font-black text-white uppercase leading-none"
+              className="cueva-title font-elrotex tracking-wide text-white leading-tight max-w-4xl mx-auto"
               style={{
-                fontSize: "clamp(2.4rem, 7.5vw, 7rem)",
-                opacity: 0,
-                textShadow: "0 0 80px rgba(46,156,63,0.35), 0 2px 40px rgba(0,0,0,0.9)",
-                letterSpacing: "0.06em",
-                animation: "cueva-flicker 8s 2s infinite",
+                fontSize: "clamp(2.2rem, 5.5vw, 4.8rem)",
+                opacity: 0
               }}
             >
-              BIENVENIDO A<br />
-              <span
-                style={{ WebkitTextStroke: "2px #92BF4E", color: "#92BF4E" }}
-                className="font-elrotex"
-              >
-                LA CUEVA
-              </span>
+              El Templo del <span className="text-marathon-lime">Monstruo Verde</span>
             </h2>
           </div>
 
           {/* Scroll Hint */}
           <div className="cueva-scroll-hint absolute bottom-8 inset-x-0 z-20 flex flex-col items-center gap-2 pointer-events-none select-none">
-            <span className="text-[10px] tracking-[0.3em] text-white/35 uppercase font-heading">
-              Scrollea para entrar
+            <span className="text-[10px] tracking-[0.25em] text-white/40 uppercase font-heading">
+              Desplaza hacia abajo para explorar
             </span>
-            <ChevronDown size={20} className="text-marathon-lime/50 animate-bounce" />
+            <ChevronDown size={18} className="text-marathon-lime/60 animate-bounce" />
           </div>
 
           {/* ──────────────────────────────────────────────── */}
-          {/* PHASE 2 — Editorial Info Panels                 */}
+          {/* FASE 2 — Tarjetas Informativas Estilo Editorial */}
           {/* ──────────────────────────────────────────────── */}
-          <div className="reveal-badges absolute inset-0 z-20 pointer-events-none select-none">
+          <div className="reveal-badges absolute inset-0 z-20 pointer-events-none select-none p-4 sm:p-8 md:p-12">
 
-            {/* TOP RULE — hairline with club label */}
+
+
+            {/* ── Tarjeta 01: Propiedad (Izquierda) ── */}
             <div
-              className="reveal-aficion absolute top-0 inset-x-0 flex items-center px-8 md:px-14 pt-[4.5rem]"
-              style={{ opacity: 0 }}
+              className="reveal-structure absolute top-1/2 left-4 sm:left-10 md:left-14 -translate-y-1/2 pointer-events-auto"
+              style={{ opacity: 0, width: "calc(100% - 2rem)", maxWidth: "340px" }}
             >
-              <div className="flex-1 h-px bg-white/10" />
-              <span className="mx-5 text-[8px] font-heading font-black tracking-[0.55em] text-white/22 uppercase whitespace-nowrap">
-                Club Deportivo Marathón · Est. {CLUB.founded}
-              </span>
-              <div className="flex-1 h-px bg-white/10" />
-            </div>
-
-            {/* ── LEFT PANEL: Yankel Rosenthal ── */}
-            <div
-              className="reveal-structure absolute top-1/2 left-0 -translate-y-1/2 pointer-events-auto"
-              style={{ opacity: 0, maxWidth: "clamp(190px, 22vw, 320px)" }}
-            >
-              <div className="flex">
-                {/* Lime left-edge accent bar */}
-                <div className="w-[3px] bg-marathon-lime self-stretch flex-shrink-0 mr-5 md:mr-6" />
-                <div className="py-8 pr-5">
-                  <p className="text-[8px] font-heading font-black tracking-[0.45em] text-marathon-lime/60 uppercase mb-3">
-                    01 — Propiedad
-                  </p>
-                  <h4
-                    className="font-heading font-black text-white uppercase"
-                    style={{ fontSize: "clamp(1.5rem, 2.8vw, 2.8rem)", lineHeight: 0.88 }}
-                  >
-                    YANKEL<br />
-                    <span className="text-marathon-lime">ROSENTHAL</span>
-                  </h4>
-                  <div className="mt-4 h-px bg-white/15 w-[85%]" />
-                  <p className="text-[11px] text-white/45 mt-3 font-body leading-relaxed max-w-[220px]">
-                    El único estadio del país propiedad exclusiva de un club. Fortaleza inexpugnable desde 2010.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* ── RIGHT PANEL: Capacidad — editorial giant numeral ── */}
-            <div
-              className="reveal-tribunas absolute top-1/2 right-0 -translate-y-1/2 pointer-events-auto text-right"
-              style={{ opacity: 0, maxWidth: "clamp(190px, 22vw, 320px)" }}
-            >
-              <div className="flex flex-row-reverse">
-                {/* Lime right-edge accent bar */}
-                <div className="w-[3px] bg-marathon-lime self-stretch flex-shrink-0 ml-5 md:ml-6" />
-                <div className="py-8 pl-5">
-                  <p className="text-[8px] font-heading font-black tracking-[0.45em] text-marathon-lime/60 uppercase mb-1">
-                    02 — Capacidad
-                  </p>
-                  {/* Oversized numeral — the typographic hero */}
-                  <div
-                    className="font-heading font-black text-white"
-                    style={{ fontSize: "clamp(3.5rem, 7.5vw, 6.5rem)", lineHeight: 0.82 }}
-                  >
-                    9K
-                  </div>
-                  <div className="mt-3 h-px bg-white/15 w-full" />
-                  <p className="text-[11px] text-white/45 mt-3 font-body leading-relaxed max-w-[220px] ml-auto">
-                    Nueve mil voces que rugen como una sola. La Cueva que tiembla.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* ── BOTTOM-LEFT: Superficie ── */}
-            <div
-              className="reveal-cancha absolute bottom-0 left-0 pointer-events-auto"
-              style={{ opacity: 0, maxWidth: "clamp(170px, 21vw, 300px)" }}
-            >
-              <div className="border-t border-white/12 pt-4 pb-5 pl-6 pr-4">
-                <p className="text-[8px] font-heading font-black tracking-[0.45em] text-marathon-lime/60 uppercase mb-2">
-                  03 — Superficie
-                </p>
-                <h4
-                  className="font-heading font-black text-white uppercase"
-                  style={{ fontSize: "clamp(1.1rem, 1.9vw, 1.6rem)", lineHeight: 0.9 }}
-                >
-                  CÉSPED<br />NATURAL
-                </h4>
-                <p className="text-[10px] text-white/40 mt-2 font-body leading-relaxed">
-                  Estándares deportivos internacionales de alto rendimiento.
-                </p>
-              </div>
-            </div>
-
-            {/* ── BOTTOM-RIGHT: Fundación ── */}
-            <div
-              className="reveal-luces absolute bottom-0 right-0 pointer-events-auto text-right"
-              style={{ opacity: 0, maxWidth: "clamp(170px, 21vw, 300px)" }}
-            >
-              <div className="border-t border-white/12 pt-4 pb-5 pr-6 pl-4">
-                <p className="text-[8px] font-heading font-black tracking-[0.45em] text-marathon-lime/60 uppercase mb-2">
-                  04 — Fundación
-                </p>
-                {/* Year as outlined typographic hero */}
-                <div
-                  className="font-heading font-black leading-none"
-                  style={{
-                    fontSize: "clamp(1.9rem, 3.8vw, 3.2rem)",
-                    lineHeight: 0.88,
-                    color: "transparent",
-                    WebkitTextStroke: "1.5px #92BF4E",
-                  }}
-                >
-                  {CLUB.founded}
-                </div>
-                <p className="text-[10px] text-white/40 mt-2 font-body leading-relaxed">
-                  Un siglo de historia verde en Honduras.
-                </p>
-              </div>
-            </div>
-
-          </div>
-
-          {/* ──────────────────────────────────────────────── */}
-          {/* PHASE 3 — Stats Scoreboard (bottom-anchored)    */}
-          {/* ──────────────────────────────────────────────── */}
-          <div
-            className="cueva-counters absolute bottom-0 inset-x-0 z-20 pointer-events-auto select-none"
-            style={{ opacity: 0 }}
-          >
-            {/* Hairline rule with label */}
-            <div className="flex items-center px-6 md:px-10">
-              <div className="flex-1 h-px bg-marathon-lime/30" />
-              <span className="mx-5 text-[8px] font-heading font-black tracking-[0.55em] text-marathon-lime/55 uppercase whitespace-nowrap">
-                Estadísticas del Club
-              </span>
-              <div className="flex-1 h-px bg-marathon-lime/30" />
-            </div>
-
-            {/* 4-cell scoreboard grid */}
-            <div
-              className="grid grid-cols-4 bg-black/75 backdrop-blur-xl"
-              style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}
-            >
-              {[
-                { num: `${YEARS_OF_PRIDE}`, suf: "+", label: "Años de\nOrgullo", accent: false },
-                { num: `${CLUB.titles}`, suf: "×", label: "Títulos\nde Liga", accent: true },
-                { num: "50K", suf: "+", label: "Seguidores\nen Redes", accent: false },
-                { num: "9,000", suf: "", label: "Capacidad\nLa Cueva", accent: false },
-              ].map((stat, i) => (
-                <div
-                  key={i}
-                  className="cueva-counter-item relative px-4 md:px-7 lg:px-10 py-5 md:py-7"
-                  style={{ borderRight: i < 3 ? "1px solid rgba(255,255,255,0.07)" : "none" }}
-                >
-                  {/* Index number */}
-                  <span className="absolute top-2.5 right-3 text-[7px] font-heading font-black text-white/15 tracking-widest">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-
-                  {/* Lime top accent bar on the titles column */}
-                  {stat.accent && (
-                    <div className="absolute top-0 left-0 right-0 h-[2px] bg-marathon-lime" />
-                  )}
-
-                  {/* Big number */}
-                  <div className="flex items-end gap-0.5 leading-none">
-                    <span
-                      className="font-heading font-black text-white"
-                      style={{ fontSize: "clamp(1.8rem, 3.8vw, 3.4rem)", lineHeight: 1 }}
-                    >
-                      {stat.num}
-                    </span>
-                    {stat.suf && (
-                      <span
-                        className="font-heading font-black text-marathon-lime pb-0.5"
-                        style={{ fontSize: "clamp(1rem, 2vw, 1.8rem)", lineHeight: 1 }}
-                      >
-                        {stat.suf}
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Label */}
-                  <p
-                    className="text-white/35 font-heading font-semibold uppercase mt-1.5"
-                    style={{
-                      fontSize: "clamp(0.52rem, 0.85vw, 0.68rem)",
-                      letterSpacing: "0.2em",
-                      whiteSpace: "pre-line",
-                    }}
-                  >
-                    {stat.label}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* ──────────────────────────────────────────────── */}
-          {/* PHASE 4 — CTA Block                             */}
-          {/* ──────────────────────────────────────────────── */}
-          <div
-            className="cueva-cta-block absolute inset-0 z-30 flex flex-col items-center justify-end pb-[10%] pointer-events-none select-none"
-            style={{ opacity: 0 }}
-          >
-            <div
-              className="cueva-cta-glow absolute bottom-[7%] w-72 h-36 rounded-full bg-marathon-green/15 blur-[70px] pointer-events-none"
-              style={{ opacity: 0.3 }}
-            />
-
-            <div className="text-center mb-8 px-4">
-              <p className="text-white/40 text-xs font-heading tracking-[0.45em] uppercase mb-3">
-                Más que un estadio
-              </p>
-              <h3
-                className="font-heading font-black text-white uppercase"
-                style={{ fontSize: "clamp(2rem, 5vw, 4.5rem)", lineHeight: 0.92 }}
-              >
-                TU CASA,{" "}
-                <span
-                  className="text-marathon-lime"
-                  style={{ filter: "drop-shadow(0 0 18px rgba(146,191,78,0.55))" }}
-                >
-                  TU CUEVA
+              <div className="bg-marathon-darkest/80 backdrop-blur-xl border border-white/10 rounded-2xl p-5 sm:p-6 shadow-2xl transition-all duration-300 hover:border-marathon-lime/30 hover:bg-marathon-darkest/90">
+                <span className="text-[0.8rem] font-heading font-bold  text-marathon-lime  block mb-2">
+                  Propiedad Exclusiva
                 </span>
-              </h3>
-              <p className="text-white/35 text-sm mt-4 max-w-sm mx-auto font-body leading-relaxed">
-                Primer estadio propio de un club hondureño. Inaugurado en 2010. Fortaleza en San Pedro Sula.
-              </p>
+                <h3 className="font-elrotex text-white text-xl sm:text-2xl mb-2">
+                  Yankel Rosenthal
+                </h3>
+                <p className="text-xs text-white/60 font-outfit leading-relaxed">
+                  El único estadio en Honduras de propiedad total de un club de fútbol. Fortaleza inexpugnable desde 2010.
+                </p>
+              </div>
             </div>
 
-            <div className="pointer-events-auto flex flex-col sm:flex-row gap-3 items-center">
-              <Button variant="primary" size="lg" href="/estadio">
-                Conoce el Yankel Rosenthal
-                <ArrowRight size={18} />
-              </Button>
-              <Button variant="outline" size="lg" href="/historia">
-                Nuestra Historia
-                <Trophy size={16} />
-              </Button>
+            {/* ── Tarjeta 02: Capacidad (Derecha) ── */}
+            <div
+              className="reveal-tribunas absolute top-1/2 right-4 sm:right-10 md:right-14 -translate-y-1/2 pointer-events-auto"
+              style={{ opacity: 0, width: "calc(100% - 2rem)", maxWidth: "340px" }}
+            >
+              <div className="bg-marathon-darkest/80 backdrop-blur-xl border border-white/10 rounded-2xl p-5 sm:p-6 shadow-2xl transition-all duration-300 hover:border-marathon-lime/30 hover:bg-marathon-darkest/90 text-right sm:text-left">
+                <span className="text-[10px] font-heading font-bold tracking-widest text-marathon-lime uppercase block mb-2">
+                  02 / Capacidad Oficial
+                </span>
+                <div className="font-heading font-extrabold text-white text-3xl sm:text-4xl mb-1">
+                  9,000 <span className="text-sm font-semibold text-white/50">espectadores</span>
+                </div>
+                <p className="text-xs text-white/60 font-body leading-relaxed mt-2">
+                  Nueve mil afisionados que hacen vibrar la cueva en cada jornada de liga local e internacional.
+                </p>
+              </div>
+            </div>
+
+            {/* ── Tarjeta 03: Superficie (Abajo Izquierda) ── */}
+            <div
+              className="reveal-cancha absolute bottom-8 left-4 sm:left-10 md:left-14 pointer-events-auto hidden sm:block"
+              style={{ opacity: 0, maxWidth: "280px" }}
+            >
+              <div className="bg-marathon-darkest/80 backdrop-blur-md border border-white/10 rounded-xl p-4 transition-all duration-300 hover:border-marathon-lime/30">
+                <span className="text-[9px] font-heading font-bold tracking-widest text-marathon-lime uppercase block mb-1">
+                  03 / Terreno de Juego
+                </span>
+                <h4 className="font-heading font-bold text-white text-sm">
+                  Césped Natural de Alto Rendimiento
+                </h4>
+              </div>
+            </div>
+
+            {/* ── Tarjeta 04: Fundación (Abajo Derecha) ── */}
+            <div
+              className="reveal-luces absolute bottom-8 right-4 sm:right-10 md:right-14 pointer-events-auto hidden sm:block"
+              style={{ opacity: 0, maxWidth: "280px" }}
+            >
+              <div className="bg-marathon-darkest/80 backdrop-blur-md border border-white/10 rounded-xl p-4 text-right transition-all duration-300 hover:border-marathon-lime/30">
+                <span className="text-[9px] font-heading font-bold tracking-widest text-marathon-lime uppercase block mb-1">
+                  04 / Legado
+                </span>
+                <h4 className="font-heading font-bold text-white text-sm">
+                  Fundado en {CLUB.founded}
+                </h4>
+              </div>
+            </div>
+
+          </div>
+
+          {/* ──────────────────────────────────────────────── */}
+          {/* FASE 3 — Marcador de Estadísticas                */}
+          {/* ──────────────────────────────────────────────── */}
+          <div
+            className="cueva-counters absolute bottom-6 inset-x-4 sm:inset-x-8 md:inset-x-12 z-20 pointer-events-auto select-none"
+            style={{ opacity: 0 }}
+          >
+            <div className="max-w-5xl mx-auto bg-marathon-darkest/85 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
+              <div className="grid grid-cols-2 md:grid-cols-4">
+                {[
+                  { num: `${YEARS_OF_PRIDE}`, suf: "+", label: "Años de Orgullo" },
+                  { num: `${CLUB.titles}`, suf: "×", label: "Títulos de Liga" },
+                  { num: "50K", suf: "+", label: "Comunidad Verde" },
+                  { num: "9,000", suf: "", label: "Capacidad La Cueva" },
+                ].map((stat, i) => (
+                  <div
+                    key={i}
+                    className="px-4 py-5 sm:py-6 text-center border-b md:border-b-0 border-r border-white/10 last:border-r-0 transition-colors duration-300 hover:bg-white/[0.03]"
+                  >
+                    <div className="flex items-baseline justify-center gap-1 leading-none mb-1.5">
+                      <span className="font-heading font-black text-white text-2xl sm:text-4xl">
+                        {stat.num}
+                      </span>
+                      {stat.suf && (
+                        <span className="font-heading font-bold text-marathon-lime text-lg sm:text-xl">
+                          {stat.suf}
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-[11px] sm:text-xs font-heading font-medium text-white/50">
+                      {stat.label}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* ──────────────────────────────────────────────── */}
+          {/* FASE 4 — Bloque Final de Llamado a la Acción     */}
+          {/* ──────────────────────────────────────────────── */}
+          <div
+            className="cueva-cta-block absolute inset-0 z-30 flex flex-col items-center justify-center p-6 text-center pointer-events-none select-none"
+            style={{ opacity: 0 }}
+          >
+            <div className="max-w-2xl mx-auto pointer-events-auto bg-marathon-darkest/90 backdrop-blur-2xl border border-white/10 rounded-3xl p-8 sm:p-12 shadow-2xl">
+              <span className="text-xs font-heading font-semibold uppercase tracking-[0.25em] text-marathon-lime block mb-3">
+                Fortaleza de San Pedro Sula
+              </span>
+              <h3 className="font-heading font-bold text-white text-3xl sm:text-5xl tracking-tight mb-4">
+                Tu casa, <span className="text-marathon-lime">tu cueva</span>
+              </h3>
+              <p className="text-sm sm:text-base text-white/60 font-body leading-relaxed mb-8 max-w-lg mx-auto">
+                Conoce de cerca la historia del primer estadio propio en el fútbol hondureño y vive la experiencia del Monstruo Verde.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-3.5 justify-center items-center">
+                <a
+                  href="#cta"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-marathon-lime text-marathon-darkest font-heading font-bold text-sm hover:bg-[#a4d458] transition-all duration-300 shadow-lg hover:shadow-marathon-lime/20"
+                >
+                  Hazte Socio
+                  <ArrowRight size={16} />
+                </a>
+                <a
+                  href="#partidos"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-white font-heading font-semibold text-sm transition-all duration-300"
+                >
+                  Ver Partidos
+                  <Trophy size={16} />
+                </a>
+              </div>
             </div>
           </div>
 
           {/* Exit fade */}
           <div
-            className="cueva-exit-fade absolute inset-0 bg-black pointer-events-none z-40"
+            className="cueva-exit-fade absolute inset-0 bg-marathon-darkest pointer-events-none z-40"
             style={{ opacity: 0 }}
           />
 
@@ -579,3 +476,4 @@ export default function TemploSection() {
     </>
   );
 }
+

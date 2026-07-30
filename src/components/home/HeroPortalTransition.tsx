@@ -155,12 +155,23 @@ export default function HeroPortalTransition() {
     resize();
     window.addEventListener("resize", resize);
 
+    let isVisible = true;
     let animationFrameId: number;
     const animate = () => {
-      renderer.render(scene, camera);
+      if (isVisible) {
+        renderer.render(scene, camera);
+      }
       animationFrameId = requestAnimationFrame(animate);
     };
     animate();
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisible = entry.isIntersecting;
+      },
+      { threshold: 0.01 }
+    );
+    observer.observe(container);
 
     // Reduced motion: render a settled state and reveal text without scrubbing.
     const prefersReduced = window.matchMedia(
@@ -178,6 +189,7 @@ export default function HeroPortalTransition() {
       return () => {
         cancelAnimationFrame(animationFrameId);
         window.removeEventListener("resize", resize);
+        observer.disconnect();
         geometry.dispose();
         material.dispose();
         renderer.dispose();
@@ -264,6 +276,7 @@ export default function HeroPortalTransition() {
     return () => {
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener("resize", resize);
+      observer.disconnect();
       ctx.revert();
       geometry.dispose();
       material.dispose();
