@@ -269,11 +269,11 @@ export default function HeroSection() {
       {/* ── 5. Scroll Indicator ── */}
       <div className="hero-scroll absolute bottom-1.5 left-1/2 -translate-x-1/2 z-40 hidden sm:block pointer-events-auto">
         <a
-          href="#templo"
-          aria-label="Explorar el estadio"
+          href="#partidos"
+          aria-label="Ver próximos partidos"
           className="flex flex-col items-center gap-1 text-white/30 hover:text-marathon-lime transition-colors duration-200"
         >
-          <span className="text-[9px] tracking-[0.2em] uppercase font-heading">Explorar</span>
+          <span className="text-[9px] tracking-[0.2em] uppercase font-heading">Partidos</span>
           <ChevronDown size={18} className="animate-bounce" />
         </a>
       </div>
