@@ -2,23 +2,56 @@
 
 import React, { useRef, useEffect } from "react";
 import { gsap } from "@/hooks/useGsap";
-import { STATS } from "@/lib/constants";
-import { Trophy, Calendar, Users, Clock, ArrowRight, ShieldCheck } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 
-const statIcons = [
-  <Calendar key="cal" size={24} className="text-marathon-green" />,
-  <Trophy key="tro" size={24} className="text-marathon-green" />,
-  <Users key="usr" size={24} className="text-marathon-green" />,
-  <Clock key="clk" size={24} className="text-marathon-green" />,
-];
-
-// Imágnes de fondo sustituibles (placeholders de alta calidad)
-const statImages = [
-  "/assets/history/historic_1925.png",
-  "/assets/stadium/celebration.png",
-  "/assets/fans/stadium_passion.png",
-  "/assets/brand/pattern.png",
+// 5 Bento Cards Configuración Estilo Apple
+const bentoCards = [
+  {
+    value: "1925",
+    label: "Año de Fundación",
+    description: "Cuna de la Furia Verde. Fundado el 25 de noviembre en San Pedro Sula.",
+    image: "/assets/history/equipazo.png",
+    colSpan: "lg:col-span-2 lg:row-span-2",
+    height: "min-h-[440px] lg:min-h-[520px]",
+    isLarge: true,
+  },
+  {
+    value: "9",
+    label: "Títulos de Liga",
+    description: "Campeones de la Liga Nacional de Honduras.",
+    image: "/assets/history/campeones.webp",
+    colSpan: "lg:col-span-1",
+    height: "min-h-[250px]",
+    isLarge: false,
+  },
+  {
+    value: "50K+",
+    label: "Afición Incondicional",
+    description: "La hinchada verdolaga más fiel del país y el liderazgo institucional.",
+    image: "/assets/history/presi.webp",
+    colSpan: "lg:col-span-1",
+    height: "min-h-[250px]",
+    isLarge: false,
+  },
+  {
+    value: "1er",
+    label: "Estadio Propio",
+    description: "Estadio Yankel Rosenthal: el único escenario privado propiedad de un club en Honduras.",
+    image: "/assets/history/equipazo.png",
+    colSpan: "lg:col-span-1",
+    height: "min-h-[260px]",
+    isLarge: false,
+  },
+  {
+    value: "100+",
+    label: "Años de Gloria",
+    description: "Un siglo de jerarquía e identidad ininterrumpida en el fútbol centroamericano.",
+    image: "/assets/history/gloria.png",
+    colSpan: "lg:col-span-2",
+    height: "min-h-[260px]",
+    isLarge: false,
+  },
 ];
 
 export default function StatsSection() {
@@ -28,65 +61,80 @@ export default function StatsSection() {
     if (!sectionRef.current) return;
 
     const ctx = gsap.context(() => {
-      // Línea de separación animada
-      gsap.fromTo(
-        ".stats-line-light",
-        { scaleX: 0, opacity: 0 },
-        {
-          scaleX: 1,
-          opacity: 1,
-          duration: 1.2,
-          ease: "power3.inOut",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 80%",
-            toggleActions: "play none none none",
-          },
-        }
-      );
+      // ── 1. SCROLL-DRIVEN ANIMATION: BANDERAS TRICOLORES ──
+      gsap.to(".flag-left", {
+        rotate: -6,
+        y: 10,
+        ease: "none",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1.5,
+        },
+      });
 
-      // Cards stagger 3D reveal
+      gsap.to(".flag-right", {
+        rotate: 6,
+        y: 10,
+        ease: "none",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1.5,
+        },
+      });
+
+      // ── 2. SCROLL-DRIVEN ANIMATION: HEADER APPLE ──
       gsap.fromTo(
-        ".stat-card-light",
-        { opacity: 0, y: 60, scale: 0.95 },
+        ".apple-stats-header",
+        { opacity: 0, y: 50, scale: 0.96 },
         {
           opacity: 1,
           y: 0,
           scale: 1,
-          duration: 0.8,
-          stagger: 0.15,
-          ease: "back.out(1.4)",
+          ease: "none",
           scrollTrigger: {
             trigger: sectionRef.current,
-            start: "top 75%",
-            toggleActions: "play none none none",
+            start: "top 80%",
+            end: "top 40%",
+            scrub: 0.8,
           },
         }
       );
 
-      // GSAP Number Counters
-      gsap.utils.toArray<HTMLElement>(".stat-number-light").forEach((el) => {
-        const endValue = parseFloat(el.dataset.value || "0");
-        const isYear = el.dataset.year === "true";
-        const suffix = el.dataset.suffix || "";
+      // ── 3. SCROLL-DRIVEN ANIMATION: BENTO CARDS ──
+      gsap.utils.toArray<HTMLElement>(".apple-bento-card").forEach((card, index) => {
+        gsap.fromTo(
+          card,
+          { opacity: 0.3, y: 70 + index * 10, scale: 0.92, rotateX: 6 },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            rotateX: 0,
+            ease: "none",
+            scrollTrigger: {
+              trigger: card,
+              start: "top 90%",
+              end: "top 55%",
+              scrub: 1,
+            },
+          }
+        );
+      });
 
-        if (isYear) {
-          el.textContent = `${endValue}${suffix}`;
-          return;
-        }
-
-        const counter = { value: 0 };
-        gsap.to(counter, {
-          value: endValue,
-          duration: 2.2,
-          ease: "power2.out",
+      // ── 4. SCROLL-DRIVEN ANIMATION: PARALLAX EN IMÁGENES ──
+      gsap.utils.toArray<HTMLElement>(".apple-card-img").forEach((img) => {
+        gsap.to(img, {
+          yPercent: -14,
+          ease: "none",
           scrollTrigger: {
-            trigger: el,
-            start: "top 85%",
-            toggleActions: "play none none none",
-          },
-          onUpdate: () => {
-            el.textContent = `${Math.floor(counter.value)}${suffix}`;
+            trigger: img,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: true,
           },
         });
       });
@@ -99,102 +147,105 @@ export default function StatsSection() {
     <section
       id="stats"
       ref={sectionRef}
-      className="relative py-24 md:py-32 overflow-hidden bg-[#F8F9FA] text-marathon-darkest select-none"
+      className="relative py-28 md:py-40 bg-[#F5F5F7] text-[#1D1D1F] select-none overflow-hidden"
     >
-      {/* ── 1. AURA AMBIENTAL VERDE SOBRE FONDO BLANCO ── */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[85vw] max-w-[900px] h-[500px] bg-gradient-to-tr from-marathon-lime/20 via-marathon-green/10 to-transparent rounded-full blur-[140px] pointer-events-none transform-gpu z-0" />
-      <div className="absolute -top-24 left-1/3 w-96 h-96 bg-marathon-lime/15 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute -bottom-24 right-1/3 w-96 h-96 bg-marathon-green/10 rounded-full blur-[120px] pointer-events-none" />
+      {/* ── BANDERAS TRICOLORES ONDULADAS EN LAS ESQUINAS ── */}
+      <div className="flag-left absolute top-0 left-0 z-20 pointer-events-none filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.15)] origin-top-left">
+        <svg width="150" height="240" viewBox="0 0 150 240" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-28 sm:w-36 md:w-40 h-auto">
+          <path d="M0 0 L45 0 L45 190 L25 170 L0 190 Z" fill="#2E9C3F" />
+          <path d="M45 0 L90 0 L90 210 L70 190 L45 210 Z" fill="#FFFFFF" stroke="#E2E8F0" strokeWidth="1" />
+          <path d="M90 0 L135 0 L135 180 L115 160 L90 180 Z" fill="#D92121" />
+          <rect x="0" y="0" width="135" height="7" fill="#012919" opacity="0.35" />
+        </svg>
+      </div>
 
-      {/* Sutil textura de puntos verdolagas */}
-      <div
-        className="absolute inset-0 opacity-[0.03] pointer-events-none z-0"
-        style={{
-          backgroundImage: `radial-gradient(circle at 2px 2px, #01402E 1px, transparent 0)`,
-          backgroundSize: "36px 36px",
-        }}
-      />
+      <div className="flag-right absolute top-0 right-0 z-20 pointer-events-none filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.15)] origin-top-right">
+        <svg width="150" height="240" viewBox="0 0 150 240" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-28 sm:w-36 md:w-40 h-auto transform scale-x-[-1]">
+          <path d="M0 0 L45 0 L45 190 L25 170 L0 190 Z" fill="#2E9C3F" />
+          <path d="M45 0 L90 0 L90 210 L70 190 L45 210 Z" fill="#FFFFFF" stroke="#E2E8F0" strokeWidth="1" />
+          <path d="M90 0 L135 0 L135 180 L115 160 L90 180 Z" fill="#D92121" />
+          <rect x="0" y="0" width="135" height="7" fill="#012919" opacity="0.35" />
+        </svg>
+      </div>
+
+      {/* Luz ambiental difuminada estilo Apple */}
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70vw] max-w-[800px] h-[400px] bg-gradient-to-tr from-marathon-lime/20 via-marathon-green/15 to-transparent rounded-full blur-[160px] pointer-events-none transform-gpu z-0" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Línea divisoria decorativa */}
-        <div className="mb-14 flex justify-center">
-          <div className="stats-line-light w-full max-w-xl h-[2px] bg-gradient-to-r from-transparent via-marathon-green/50 to-transparent shadow-[0_0_12px_rgba(46,156,63,0.3)] origin-center" />
-        </div>
 
-        {/* Header de Sección sobre fondo claro */}
-        <div className="text-center mb-16 relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-marathon-green/10 border border-marathon-green/20 text-marathon-green text-xs font-heading font-bold uppercase tracking-[0.3em] mb-4">
-            <ShieldCheck size={14} />
-            <span>En Números · Cien Años de Gloria</span>
-          </div>
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-black text-marathon-darkest uppercase tracking-tight leading-none">
-            La Leyenda del <span className="text-marathon-green">Monstruo</span>
+        {/* Header Estilo Apple con FUENTE ELROTEX */}
+        <div className="apple-stats-header text-center mb-16 md:mb-20 max-w-3xl mx-auto">
+          <p className="text-xs sm:text-sm font-outfit font-bold uppercase tracking-[0.25em] text-marathon-green mb-4">
+            Cien Años · En Números
+          </p>
+
+          <h2 className="text-4xl sm:text-6xl lg:text-7xl font-elrotex tracking-wide leading-[1.05] text-[#1D1D1F] uppercase mb-6 drop-shadow-sm">
+            La historia se mide en <span className="text-transparent bg-clip-text bg-gradient-to-r from-marathon-lime via-marathon-green to-marathon-dark">Grandeza.</span>
           </h2>
-          <p className="text-marathon-darkest/60 text-xs sm:text-sm max-w-lg mx-auto mt-3 font-body">
-            Estadísticas históricas que inmortalizan un siglo de lucha, triunfos y pasión inquebrantable.
+
+          <p className="text-base sm:text-lg font-outfit text-[#86868B] font-normal leading-relaxed">
+            Un recorrido por los hitos que convirtieron al Club Deportivo Marathón en el referente histórico de la costa norte de Honduras.
           </p>
         </div>
 
-        {/* ── 2. CARDS BLANCAS DE ALTA ESTÉTICA CON PLACEHOLDERS DE IMAGEN ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 relative z-10">
-          {STATS.map((stat, index) => (
+        {/* ── BENTO GRID ESTILO APPLE (5 CARDS PERFECTAMENTE DISTRIBUIDAS) ── */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
+          {bentoCards.map((card) => (
             <div
-              key={stat.label}
-              className="stat-card-light group relative rounded-3xl overflow-hidden border border-marathon-green/15 bg-white/90 backdrop-blur-md shadow-xl shadow-marathon-green/5 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-marathon-green/20 hover:border-marathon-green/40 flex flex-col justify-between"
+              key={card.label}
+              className={`apple-bento-card group relative rounded-[2.5rem] overflow-hidden bg-marathon-darkest border border-white/10 shadow-2xl transition-all duration-700 hover:shadow-[0_30px_80px_rgba(146,191,78,0.3)] hover:border-marathon-lime/60 flex flex-col justify-end ${card.colSpan} ${card.height}`}
             >
-              {/* Top Image Placeholder Container (2/5 de la tarjeta) */}
-              <div className="relative h-36 w-full overflow-hidden bg-marathon-darkest/10">
-                <Image
-                  src={statImages[index]}
-                  alt={stat.label}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 25vw"
-                  className="object-cover object-center opacity-85 group-hover:scale-110 transition-all duration-700 pointer-events-none"
-                />
-                {/* Gradient Overlay blanco que difumina suavemente hacia la base */}
-                <div className="absolute inset-0 bg-gradient-to-t from-white via-white/40 to-transparent z-1" />
-                
-                {/* Icono Flotante en la esquina superior */}
-                <div className="absolute top-3 right-3 z-10 w-10 h-10 rounded-xl bg-white/90 backdrop-blur-md border border-marathon-green/20 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
-                  {statIcons[index]}
+              {/* Contenedor de Imagen con Zoom Apple */}
+              <div className="absolute inset-0 z-0 overflow-hidden bg-marathon-darkest">
+                <div className="apple-card-img absolute inset-[-10%] w-[120%] h-[120%]">
+                  <Image
+                    src={card.image}
+                    alt={card.label}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    className="object-cover object-center opacity-75 group-hover:opacity-95 group-hover:scale-105 transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] filter brightness-95 contrast-105"
+                  />
                 </div>
+
+                {/* Overlays Cinemáticos Oscuros */}
+                <div className="absolute inset-0 bg-gradient-to-t from-marathon-darkest via-marathon-darkest/60 to-transparent z-1" />
+                <div className="absolute inset-0 bg-black/20 z-1 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
               </div>
 
-              {/* Contenido de la Tarjeta (3/5 de la tarjeta) */}
-              <div className="relative z-10 p-6 pt-1 flex flex-col items-center text-center justify-center min-h-[160px]">
-                
-                {/* Número Gigante en Fuente Elrotex con Verde Esmeralda */}
-                <div className="my-1">
-                  <span
-                    className="stat-number-light font-elrotex text-5xl sm:text-6xl font-black tracking-wide text-transparent bg-clip-text bg-gradient-to-b from-marathon-green via-[#1a702b] to-marathon-darkest drop-shadow-sm"
-                    data-value={stat.value}
-                    data-suffix={stat.suffix}
-                    data-year={stat.isYear ? "true" : "false"}
-                  >
-                    {stat.isYear ? `${stat.value}${stat.suffix}` : `0${stat.suffix}`}
+              {/* Contenido Tipográfico Luminoso sobre Fondo Oscuro */}
+              <div className="relative z-10 p-8 sm:p-10 flex flex-col justify-end">
+
+                {/* Número Gigante con Fuente Elrotex ELEGANTE y LUMINOSA */}
+                <div className="mb-1">
+                  <span className={`font-elrotex font-normal text-transparent bg-clip-text bg-gradient-to-r from-marathon-lime via-[#a4d458] to-white drop-shadow-[0_4px_20px_rgba(146,191,78,0.45)] leading-none block ${card.isLarge ? "text-7xl sm:text-8xl lg:text-9xl" : "text-6xl sm:text-7xl"}`}>
+                    {card.value}
                   </span>
                 </div>
 
-                {/* Etiqueta */}
-                <p className="text-xs sm:text-sm font-heading font-bold uppercase tracking-[0.2em] text-marathon-darkest/80 group-hover:text-marathon-green transition-colors duration-300">
-                  {stat.label}
-                </p>
+                {/* Título Principal (Elrotex Normal) */}
+                <h3 className="text-xl sm:text-2xl font-elrotex font-normal uppercase tracking-wide text-white mb-2 group-hover:text-marathon-lime transition-colors duration-300">
+                  {card.label}
+                </h3>
 
-                {/* Resplandor neón inferior en hover */}
-                <div className="absolute bottom-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-marathon-green to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                {/* Descripción Outfit Blanca Suave */}
+                <p className="text-xs sm:text-sm font-outfit text-white/75 font-normal leading-relaxed max-w-md">
+                  {card.description}
+                </p>
               </div>
+
+              {/* Resplandor verde neón brillante al hover */}
+              <div className="absolute bottom-0 inset-x-0 h-1.5 bg-gradient-to-r from-transparent via-marathon-lime to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             </div>
           ))}
         </div>
 
-        {/* CTA al final de la sección clara */}
-        <div className="text-center mt-16 relative z-10">
+        {/* CTA Minimalista Apple Style */}
+        <div className="text-center mt-16 md:mt-20 relative z-10">
           <a
             href="#partidos"
-            className="inline-flex items-center gap-2.5 px-8 py-4 rounded-2xl bg-white hover:bg-marathon-green text-marathon-darkest hover:text-white border border-marathon-green/25 font-heading font-bold text-sm uppercase tracking-wider transition-all duration-300 shadow-lg shadow-marathon-green/10 hover:shadow-xl hover:shadow-marathon-green/30 group"
+            className="inline-flex items-center gap-2.5 px-8 py-4 rounded-full bg-[#1D1D1F] hover:bg-marathon-green text-white font-outfit font-bold text-sm tracking-wide transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-marathon-green/30 group"
           >
-            <span>Explorar más del club</span>
+            <span>Conoce la historia completa</span>
             <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform duration-200" />
           </a>
         </div>
