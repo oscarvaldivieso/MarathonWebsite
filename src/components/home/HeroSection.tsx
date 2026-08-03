@@ -210,73 +210,14 @@ export default function HeroSection() {
         <div className="hero-match-card w-full mt-auto pointer-events-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4 w-full">
 
-            {/* CTAs — con anchors funcionales */}
-            <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center justify-center md:justify-start gap-2.5 sm:gap-3.5 w-full md:w-auto">
-              <a
-                href="#cta"
-                className="hero-cta relative inline-flex items-center justify-center gap-1.5 sm:gap-2.5 px-3.5 sm:px-6 py-2.5 sm:py-3.5 rounded-xl sm:rounded-2xl bg-gradient-to-r from-marathon-lime via-[#a4d458] to-marathon-lime text-marathon-darkest font-heading font-black text-[11px] sm:text-sm uppercase tracking-wider transition-all duration-300 shadow-[0_0_20px_rgba(146,191,78,0.4)] hover:shadow-[0_0_35px_rgba(146,191,78,0.7)] active:scale-[0.98] group overflow-hidden border border-white/40 text-center"
-              >
-                <span className="absolute inset-0 w-1/2 h-full bg-white/35 skew-x-[-20deg] -translate-x-full group-hover:translate-x-[300%] transition-transform duration-700 ease-in-out pointer-events-none" />
-                <Ticket size={15} className="text-marathon-darkest shrink-0 group-hover:rotate-12 transition-transform duration-300 hidden xs:inline-block sm:inline-block" />
-                <span className="whitespace-nowrap">Hazte Socio</span>
-                <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform duration-200 shrink-0 hidden sm:inline-block" />
-              </a>
-
-              <a
-                href="#partidos"
-                className="hero-cta relative inline-flex items-center justify-center gap-1.5 sm:gap-2.5 px-3.5 sm:px-6 py-2.5 sm:py-3.5 rounded-xl sm:rounded-2xl bg-white/5 hover:bg-marathon-lime/15 border border-white/20 hover:border-marathon-lime/60 text-white hover:text-marathon-lime font-heading font-extrabold text-[11px] sm:text-sm uppercase tracking-wider transition-all duration-300 backdrop-blur-md shadow-lg hover:shadow-[0_0_20px_rgba(146,191,78,0.2)] active:scale-[0.98] group text-center"
-              >
-                <span className="whitespace-nowrap">Ver partidos</span>
-              </a>
-            </div>
-
-            {/* Próximo Partido */}
-            <div className="relative rounded-full overflow-hidden border border-marathon-lime/45 bg-marathon-darkest/85 backdrop-blur-2xl px-4 sm:px-8 py-2.5 sm:py-3.5 shadow-[0_15px_40px_rgba(0,0,0,0.8),0_0_35px_rgba(146,191,78,0.3)] flex items-center justify-between sm:justify-start gap-3 sm:gap-6 w-full md:w-auto group">
-              <Image
-                src="/assets/brand/pattern.png"
-                alt=""
-                fill
-                className="object-cover opacity-60 group-hover:opacity-85 transition-opacity duration-300 pointer-events-none"
-                aria-hidden="true"
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-marathon-darkest/70 via-marathon-dark/45 to-marathon-darkest/70 pointer-events-none" />
-
-              <div className="relative z-10 flex items-center gap-2 sm:gap-3 shrink-0">
-                <div className="relative w-8 h-8 sm:w-10 sm:h-10 shrink-0">
-                  <Image src="/assets/brand/escudo_normal.svg" alt="CD Marathón" width={40} height={40} className="object-contain filter drop-shadow-[0_4px_12px_rgba(0,0,0,0.6)]" />
-                </div>
-                <span className="text-marathon-lime font-elrotex font-black text-xs sm:text-md tracking-widest drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">VS</span>
-                <div className="relative w-8 h-8 sm:w-10 sm:h-10 shrink-0">
-                  <Image src="/assets/matchday/teams/escudo_olimpia.png" alt="CD Olimpia" width={40} height={40} className="object-contain filter drop-shadow-[0_4px_12px_rgba(0,0,0,0.6)]" />
-                </div>
-              </div>
-
-              <div className="relative z-10 flex flex-col justify-center pr-1 sm:pr-3 text-right sm:text-left">
-                <span className="text-marathon-lime text-[11px] sm:text-[13px] font-heading font-black">Próximo Partido</span>
-                <span className="text-white font-heading font-black text-[11px] sm:text-sm uppercase tracking-wide whitespace-nowrap">
-                  Marathón <span className="text-white/40 font-normal">vs</span> Olimpia
-                </span>
-                <span className="text-white/60 text-[10px] sm:text-[11px] font-body capitalize whitespace-nowrap">
-                  {formatMatchDate(NEXT_MATCH.date)} · {NEXT_MATCH.time}
-                </span>
-              </div>
-            </div>
-
           </div>
         </div>
       </div>
 
-      {/* ── 5. Scroll Indicator ── */}
-      <div className="hero-scroll absolute bottom-1.5 left-1/2 -translate-x-1/2 z-40 hidden sm:block pointer-events-auto">
-        <a
-          href="#partidos"
-          aria-label="Ver próximos partidos"
-          className="flex flex-col items-center gap-1 text-white/30 hover:text-marathon-lime transition-colors duration-200"
-        >
-          <span className="text-[9px] tracking-[0.2em] uppercase font-heading">Partidos</span>
-          <ChevronDown size={18} className="animate-bounce" />
-        </a>
-      </div>
+
+
+      {/* Rich Verdolaga Green Transition Gradient into UpcomingMatches */}
+      <div className="absolute bottom-0 left-0 right-0 h-36 bg-gradient-to-b from-transparent via-[#012215]/80 to-[#010f0a] pointer-events-none z-30" />
     </section>
   );
 }
