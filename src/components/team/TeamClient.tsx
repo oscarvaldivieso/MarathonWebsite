@@ -59,7 +59,7 @@ export default function TeamClient() {
               <button
                 key={option.id}
                 onClick={() => setActiveFilter(option.id)}
-                className={`relative px-4 py-2 text-xs sm:text-sm font-heading font-medium rounded-full transition-all duration-300 whitespace-nowrap cursor-pointer ${isActive
+                className={`relative px-4 py-2 text-md sm:text-md font-heading font-bold rounded-full transition-all duration-300 whitespace-nowrap cursor-pointer ${isActive
                   ? "text-marathon-darkest"
                   : "text-marathon-light/70 hover:text-marathon-light"
                   }`}

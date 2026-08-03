@@ -77,7 +77,7 @@ export default function TeamPage() {
               Furia Verde
             </div>
             
-            <h1 className="relative z-10 text-4xl sm:text-5xl md:text-6xl font-heading font-black text-marathon-light tracking-wide uppercase leading-none">
+            <h1 className="relative z-10 text-4xl sm:text-5xl md:text-6xl font-elrotex font-black text-marathon-light tracking-wide uppercase leading-none">
               NUESTRO <span className="text-gradient">PLANTEL</span>
             </h1>
           </div>
