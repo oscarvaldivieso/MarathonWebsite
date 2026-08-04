@@ -3,44 +3,11 @@
 import React, { useRef, useEffect } from "react";
 import { gsap } from "@/hooks/useGsap";
 import { PLAYERS } from "@/lib/players-data";
-import { ArrowRight, Shield, Target, Wand2, Hand, Sparkles } from "lucide-react";
+import { ArrowRight, Shield } from "lucide-react";
 import Image from "next/image";
-import { cn } from "@/lib/utils";
 
 // Select 4 star players for homepage highlight
 const STAR_PLAYER_IDS = ["cesar-samudio", "alexy-vega", "alberth-elis", "nicolas-messiniti"];
-
-// Icon Badge Component for Positions (Portero = Guante, Defensa = Escudo, Medio = Varita Mágica, Delantero = Blanco/Target)
-function PositionBadge({ category, position }: { category: string; position: string }) {
-  const getPositionData = () => {
-    switch (category) {
-      case "goalkeeper":
-        return { icon: Hand, label: "Portero", color: "text-amber-400 border-amber-500/30 bg-amber-500/10 shadow-amber-500/20" };
-      case "defender":
-        return { icon: Shield, label: "Defensa", color: "text-emerald-400 border-emerald-500/30 bg-emerald-500/10 shadow-emerald-500/20" };
-      case "midfielder":
-        return { icon: Wand2, label: "Mediocampista", color: "text-violet-400 border-violet-500/30 bg-violet-500/10 shadow-violet-500/20" };
-      case "forward":
-        return { icon: Target, label: "Delantero", color: "text-marathon-lime border-marathon-lime/40 bg-marathon-lime/10 shadow-marathon-lime/20" };
-      default:
-        return { icon: Sparkles, label: position, color: "text-marathon-lime border-marathon-lime/30 bg-marathon-lime/10" };
-    }
-  };
-
-  const { icon: Icon, label, color } = getPositionData();
-
-  return (
-    <div
-      title={`${label} - ${position}`}
-      className={cn(
-        "p-2 rounded-full glass border flex items-center justify-center transition-all duration-300 group-hover:scale-110 shadow-md backdrop-blur-md",
-        color
-      )}
-    >
-      <Icon size={14} className="stroke-[2.5]" />
-    </div>
-  );
-}
 
 export default function FeaturedPlayersSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -105,35 +72,33 @@ export default function FeaturedPlayersSection() {
           {featuredPlayers.map((player) => (
             <div
               key={player.id}
-              className="player-card group relative bg-marathon-darkest/70 backdrop-blur-md border border-white/10 hover:border-marathon-lime/50 rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1.5 shadow-xl hover:shadow-marathon-lime/20 flex flex-col justify-between"
+              className="player-card group relative bg-marathon-darkest/70 backdrop-blur-md border border-white/10 hover:border-marathon-lime/60 rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1.5 shadow-xl hover:shadow-[0_0_35px_rgba(146,191,78,0.35)] flex flex-col justify-between"
             >
-              {/* Background dorsal number - Elegant scale & subtle hover zoom */}
-              <div className="absolute right-2 top-0 select-none pointer-events-none transition-all duration-500 z-0 leading-none opacity-15 group-hover:opacity-35 group-hover:scale-105 text-marathon-light/30 group-hover:text-marathon-lime group-hover:drop-shadow-[0_0_20px_rgba(146,191,78,0.4)]">
-                <span className="text-[135px] font-elrotex leading-none tracking-tighter block">
-                  {player.number}
+              {/* Ambient Spotlight on Hover */}
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_60%,rgba(146,191,78,0.35)_0%,transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-0 pointer-events-none" />
+
+              {/* Top info badge - Escudo Centenario Blanco (Esquina Superior Izquierda) + Position Pill */}
+              <div className="p-4 flex items-center justify-between z-20">
+                <img
+                  src="/assets/brand/escudocentenario_blanco.svg"
+                  alt="Escudo Marathón Centenario Blanco"
+                  className="h-8 w-8 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)] opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300"
+                />
+                <span className="text-[10px] font-heading font-bold uppercase tracking-wider bg-white/5 border border-white/10 px-2.5 py-1 rounded-full text-white/70">
+                  {player.position}
                 </span>
               </div>
 
-              {/* Top info badge */}
-              <div className="p-4 flex items-center justify-between z-10">
-                <span className="text-2xl font-elrotex font-black text-marathon-lime">
-                  #{player.number}
-                </span>
-                
-                {/* Position Minimalist Icon Badge (Guante, Escudo, Varita, Blanco) */}
-                <PositionBadge category={player.category} position={player.position} />
-              </div>
-
-              {/* Player Image & Garras del Monstruo en Rojo Puro en Hover */}
+              {/* Player Image & Garras del Monstruo (Blanco con Verde) en Hover */}
               <div className="relative h-64 w-full flex items-end justify-center overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-t from-marathon-darkest via-transparent to-transparent z-20" />
 
-                {/* LAS GARRAS DEL MONSTRUO (garras.svg Rojo Puro en Hover detrás del jugador) */}
+                {/* LAS GARRAS DEL MONSTRUO (garras.svg Blanco con Verde + Doble Aura Luminosa) */}
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500 z-0 pointer-events-none translate-y-8">
                   <img
                     src="/assets/hero/garras.svg"
-                    alt="Garras del Monstruo Rojas"
-                    className="w-full h-full object-contain filter drop-shadow-[0_4px_20px_rgba(237,28,36,0.5)]"
+                    alt="Garras del Monstruo Blancas y Verdes"
+                    className="w-full h-full object-contain filter drop-shadow-[0_0_25px_rgba(146,191,78,0.7)] drop-shadow-[0_0_12px_rgba(255,255,255,0.85)]"
                   />
                 </div>
 
@@ -151,31 +116,23 @@ export default function FeaturedPlayersSection() {
                 )}
               </div>
 
-              {/* Player Footer Details */}
-              <div className="p-4 relative z-20 bg-marathon-darkest/90 border-t border-white/5">
-                <h3 className="text-lg font-heading font-bold text-white group-hover:text-marathon-lime transition-colors duration-300">
-                  {player.name}
-                </h3>
-                <p className="text-xs text-white/50 font-body mb-3">
-                  {player.nationality} · {player.height || "1.80m"}
-                </p>
+              {/* Player Footer Details - Nombre (Izquierda) + Número Dorsal (Esquina Inferior Derecha) */}
+              <div className="p-4 relative z-20 bg-marathon-darkest/90 border-t border-white/5 flex items-end justify-between gap-2">
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-lg font-heading font-bold text-white group-hover:text-marathon-lime transition-colors duration-300 truncate">
+                    {player.name}
+                  </h3>
+                  <p className="text-xs text-white/50 font-body">
+                    {player.nationality} · {player.height || "1.80m"}
+                  </p>
+                </div>
 
-                {player.stats && (
-                  <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/5 text-[11px] font-heading">
-                    <div className="bg-white/5 rounded-lg p-1.5 text-center">
-                      <span className="text-white/40 block text-[9px] uppercase">Partidos</span>
-                      <span className="text-white font-bold">{player.stats.matchesPlayed}</span>
-                    </div>
-                    <div className="bg-white/5 rounded-lg p-1.5 text-center">
-                      <span className="text-white/40 block text-[9px] uppercase">
-                        {player.category === "goalkeeper" ? "Vallas Cero" : "Goles"}
-                      </span>
-                      <span className="text-marathon-lime font-bold">
-                        {player.category === "goalkeeper" ? player.stats.cleanSheets || 0 : player.stats.goals || 0}
-                      </span>
-                    </div>
-                  </div>
-                )}
+                {/* NÚMERO EN LA ESQUINA INFERIOR DERECHA */}
+                <div className="flex-shrink-0 text-right">
+                  <span className="text-3xl font-elrotex font-black text-marathon-lime group-hover:text-white group-hover:drop-shadow-[0_0_12px_rgba(146,191,78,0.8)] transition-all duration-300 leading-none block">
+                    #{player.number}
+                  </span>
+                </div>
               </div>
             </div>
           ))}

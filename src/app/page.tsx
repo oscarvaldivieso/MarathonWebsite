@@ -31,8 +31,6 @@ export default function HomePage() {
       {/* 7. Pasión Verdolaga */}
       <PassionSection />
 
-      {/* 8. CTA de Conversión */}
-      <CtaSection />
     </div>
   );
 }

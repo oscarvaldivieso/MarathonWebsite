@@ -90,7 +90,7 @@ export default function PassionSection() {
       }, 0);
 
       // 2. Coreographed Reveals based on scroll progress of the drawing path (total duration: 1)
-      
+
       // Row 1 (Origins Centered Image) - appears at 8% progress
       tl.fromTo(".row-1-img",
         { opacity: 0, scale: 0.85, y: 40 },
@@ -166,7 +166,7 @@ export default function PassionSection() {
 
       {/* ── SPOTLIGHT CONTAINER (Wavy SVG drawing path) ─────────────────── */}
       <div className="spotlight relative w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 flex flex-col gap-32 md:gap-44 overflow-visible z-10">
-        
+
         {/* Contenedor del trazo SVG de fondo animado (Garantizado por debajo de todo el contenido) */}
         <div className="svg-path absolute top-[3%] bottom-[3%] left-1/2 -translate-x-1/2 w-[90%] md:w-[94%] z-0 pointer-events-none">
           <svg
@@ -233,9 +233,9 @@ export default function PassionSection() {
         {/* Fila 1 (Imagen Histórica Centrada) */}
         <div className="row relative z-10 flex justify-center items-center">
           <div className="row-1-img img-wrapper relative z-10 w-full max-w-[650px] aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border border-white/10 filter drop-shadow-[0_15px_30px_rgba(14,114,29,0.25)] opacity-0 will-change-transform bg-black/80 backdrop-blur-sm">
-            <img 
-              src={SLIDES[0].image} 
-              alt="Club Deportivo Marathón 1925" 
+            <img
+              src={SLIDES[0].image}
+              alt="Club Deportivo Marathón 1925"
               className="w-full h-full object-cover select-none pointer-events-none"
             />
           </div>
@@ -258,9 +258,9 @@ export default function PassionSection() {
           </div>
           <div className="col flex justify-center">
             <div className="row-2-img img-wrapper relative z-10 w-full max-w-[480px] aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border border-white/10 filter drop-shadow-[0_15px_30px_rgba(255,255,255,0.15)] opacity-0 will-change-transform bg-black/80 backdrop-blur-sm">
-              <img 
-                src={SLIDES[1].image} 
-                alt="Celebración Plantel de Marathón" 
+              <img
+                src={SLIDES[1].image}
+                alt="Celebración Plantel de Marathón"
                 className="w-full h-full object-cover select-none pointer-events-none"
               />
             </div>
@@ -271,9 +271,9 @@ export default function PassionSection() {
         <div className="row relative z-10 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center">
           <div className="col flex justify-center md:order-1 order-2">
             <div className="row-3-img img-wrapper relative z-10 w-full max-w-[480px] aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border border-white/10 filter drop-shadow-[0_15px_30px_rgba(217,33,33,0.25)] opacity-0 will-change-transform bg-black/80 backdrop-blur-sm">
-              <img 
-                src={SLIDES[2].image} 
-                alt="Hinchada Verdolaga en el Yankel" 
+              <img
+                src={SLIDES[2].image}
+                alt="Hinchada Verdolaga en el Yankel"
                 className="w-full h-full object-cover select-none pointer-events-none"
               />
             </div>
@@ -322,93 +322,7 @@ export default function PassionSection() {
       </div>
 
       {/* ── LOWER SCROLLABLE SECTION (Quotes & Fan Base) ── */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 pt-24 border-t border-marathon-green/15 bg-marathon-darkest">
-        
-        {/* Voz del Hincha subtitle header */}
-        <div className="text-center mb-16">
-          <span className="text-xs font-heading font-semibold uppercase tracking-[0.3em] text-marathon-lime/70 mb-3 block">
-            Voz del Hincha
-          </span>
-          <h3 className="text-4xl md:text-5xl font-heading font-black text-white uppercase">
-            La Hinchada <span className="text-marathon-lime">Habla</span>
-          </h3>
-          <p className="text-marathon-light/40 text-sm mt-3 max-w-lg mx-auto">
-            Fidelidad inquebrantable, amor eterno por estos colores.
-          </p>
-        </div>
 
-        {/* Quotes Card Carousel */}
-        <div className="passion-quotes-card relative max-w-3xl mx-auto">
-          <div className="glass-card rounded-3xl p-8 md:p-12 text-center min-h-[280px] flex flex-col items-center justify-center">
-            {/* Quote Icon */}
-            <Quote
-              size={40}
-              className="text-marathon-green/30 mb-6"
-            />
-
-            {/* Carousel quotes wrapper */}
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentQuote}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.4 }}
-              >
-                <blockquote className="text-xl md:text-2xl lg:text-3xl font-heading font-medium text-marathon-light leading-relaxed mb-6">
-                  &ldquo;{FAN_QUOTES[currentQuote].text}&rdquo;
-                </blockquote>
-                <cite className="text-marathon-lime text-sm font-heading not-italic flex items-center justify-center gap-2">
-                  <Heart size={14} className="fill-marathon-lime" />
-                  {FAN_QUOTES[currentQuote].author}
-                </cite>
-              </motion.div>
-            </AnimatePresence>
-
-            {/* Quote Dots navigation bar */}
-            <div className="flex items-center gap-4 mt-8">
-              <button
-                onClick={prevQuote}
-                className="w-10 h-10 rounded-full border border-marathon-green/30 flex items-center justify-center text-marathon-light/50 hover:text-marathon-lime hover:border-marathon-lime/50 transition-all duration-300 cursor-pointer"
-                aria-label="Previous quote"
-              >
-                <ChevronLeft size={18} />
-              </button>
-
-              <div className="flex items-center gap-2">
-                {FAN_QUOTES.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentQuote(index)}
-                    className={`w-2 h-2 rounded-full transition-all duration-300 cursor-pointer ${
-                      index === currentQuote
-                        ? "bg-marathon-lime w-6"
-                        : "bg-marathon-light/20 hover:bg-marathon-light/40"
-                    }`}
-                    aria-label={`Quote ${index + 1}`}
-                  />
-                ))}
-              </div>
-
-              <button
-                onClick={nextQuote}
-                className="w-10 h-10 rounded-full border border-marathon-green/30 flex items-center justify-center text-marathon-light/50 hover:text-marathon-lime hover:border-marathon-lime/50 transition-all duration-300 cursor-pointer"
-                aria-label="Next quote"
-              >
-                <ChevronRight size={18} />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Action Button */}
-        <div className="passion-cta-block text-center mt-10">
-          <Button variant="outline" size="lg" href="/hinchada">
-            Únete a la hinchada
-            <ArrowRight size={18} />
-          </Button>
-        </div>
-      </div>
     </section>
   );
 }

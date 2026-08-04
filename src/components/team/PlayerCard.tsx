@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from "framer-motion";
+import { motion, useMotionValue, useTransform, useSpring } from "framer-motion";
 import { Player } from "@/types";
 import { cn } from "@/lib/utils";
 import { Shield, Sparkles } from "lucide-react";
@@ -49,22 +49,13 @@ const PlayerCard = React.memo(function PlayerCard({ player, onClick }: PlayerCar
     setIsHovered(true);
   };
 
-  const displayStat = () => {
-    if (player.category === "goalkeeper") {
-      return { label: "Vallas Invictas", value: player.stats.cleanSheets };
-    }
-    return { label: "Goles", value: player.stats.goals || 0 };
-  };
-
-  const stat = displayStat();
-
   return (
     <motion.div
       onClick={() => onClick(player)}
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className="relative h-[380px] w-full cursor-pointer select-none overflow-visible group"
+      className="relative h-[310px] xs:h-[330px] sm:h-[380px] w-full cursor-pointer select-none overflow-visible group"
       style={{
         perspective: 1000,
         rotateX,
@@ -80,30 +71,16 @@ const PlayerCard = React.memo(function PlayerCard({ player, onClick }: PlayerCar
         className={cn(
           "absolute inset-0 rounded-2xl glass-card border transition-[border-color,box-shadow,transform] duration-500 z-0 overflow-hidden",
           isHovered
-            ? "border-marathon-lime/50 shadow-2xl shadow-marathon-green/30 scale-[1.02]"
+            ? "border-marathon-lime/60 shadow-[0_0_35px_rgba(146,191,78,0.35)] scale-[1.02]"
             : "border-marathon-green/10 shadow-md"
         )}
         style={{ transform: "translateZ(10px)" }}
       >
-        {/* Background dorsal number - Elegant scale & subtle hover zoom */}
+        {/* Ambient glow spotlight behind player on hover */}
         <div
           className={cn(
-            "absolute right-2 top-0 select-none pointer-events-none transition-all duration-500 z-0 leading-none",
-            isHovered
-              ? "opacity-35 scale-105 text-marathon-lime drop-shadow-[0_0_20px_rgba(146,191,78,0.4)]"
-              : "opacity-15 text-marathon-light/30 scale-100"
-          )}
-        >
-          <span className="text-[135px] font-elrotex leading-none tracking-tighter block">
-            {player.number}
-          </span>
-        </div>
-
-        {/* Ambient glow spotlight behind player */}
-        <div
-          className={cn(
-            "absolute inset-0 bg-[radial-gradient(circle_at_center,var(--color-marathon-green)_0%,transparent_70%)] opacity-0 transition-opacity duration-500 z-0 pointer-events-none",
-            isHovered && "opacity-40"
+            "absolute inset-0 bg-[radial-gradient(circle_at_50%_60%,rgba(146,191,78,0.35)_0%,transparent_70%)] opacity-0 transition-opacity duration-500 z-0 pointer-events-none",
+            isHovered && "opacity-100 animate-pulse-glow"
           )}
         />
       </div>
@@ -112,91 +89,71 @@ const PlayerCard = React.memo(function PlayerCard({ player, onClick }: PlayerCar
           2. CARD CONTENT WRAPPER (Header y Footer Details)
           ───────────────────────────────────────────────────────────── */}
       <div
-        className="absolute inset-0 flex flex-col justify-between p-5 z-20 pointer-events-none"
+        className="absolute inset-0 flex flex-col justify-between p-3.5 sm:p-5 z-20 pointer-events-none"
         style={{ transform: "translateZ(30px)" }}
       >
-        {/* Top Header - Position and Captain Badge */}
+        {/* Top Header - Escudo Centenario Blanco (Superior Izquierda) + Position Pill */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            {/* ESCUDO MARATHON CENTENARIO BLANCO (Esquina Superior Izquierda) */}
+            <img
+              src="/assets/brand/escudocentenario_blanco.svg"
+              alt="Escudo Marathón Centenario Blanco"
+              className="h-8 w-8 sm:h-10 sm:w-10 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)] opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300"
+            />
             {player.isCaptain && (
-              <span className="text-[9px] px-2 py-0.5 rounded bg-marathon-lime text-marathon-darkest font-elrotex font-black tracking-widest flex items-center gap-0.5 animate-pulse-glow">
+              <span className="text-[8px] sm:text-[9px] px-1.5 py-0.5 sm:px-2 sm:py-0.5 rounded bg-marathon-lime text-marathon-darkest font-elrotex font-black tracking-widest flex items-center gap-0.5 animate-pulse-glow">
                 <Sparkles size={8} /> CAPITÁN
               </span>
             )}
           </div>
-          <span className="text-[10px] px-2.5 py-1 rounded-full glass border border-marathon-green/20 text-marathon-light/80 font-heading tracking-wider uppercase font-semibold">
+
+          <span className="text-[11px] sm:text-[13px] px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-marathon-light/80 font-heading font-light">
             {player.position}
           </span>
         </div>
 
-        {/* Bottom Details - Name and quick stats */}
-        <div className="relative mt-auto">
-          <h3 className="text-xl font-elrotex text-marathon-light tracking-wider truncate transition-colors duration-300 uppercase group-hover:text-marathon-lime">
-            {player.name}
-          </h3>
-          <p className="text-[11px] font-body text-marathon-light/50 tracking-wider">
-            {player.nationality}
-          </p>
+        {/* Bottom Details - Name (Izquierda) y Número Dorsal (Esquina Inferior Derecha) */}
+        <div className="relative mt-auto flex items-end justify-between gap-1.5 sm:gap-2">
+          <div className="min-w-0 flex-1">
+            <h3 className="text-sm xs:text-base sm:text-[1.3em] font-elrotex text-marathon-light tracking-wider truncate transition-colors duration-300 uppercase group-hover:text-marathon-lime">
+              {player.name}
+            </h3>
+            <p className="text-[10px] sm:text-[11px] font-body text-marathon-light/50 tracking-wider truncate">
+              {player.nationality}
+            </p>
+          </div>
 
-          {/* Quick Stats Reveal on Hover */}
-          <div className="h-6 mt-1.5 overflow-hidden relative">
-            <AnimatePresence initial={false}>
-              {!isHovered ? (
-                <motion.div
-                  key="matches"
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: -20, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="text-[11px] font-heading font-medium text-marathon-light/60 flex items-center gap-1.5"
-                >
-                  <span>Partidos:</span>
-                  <span className="text-marathon-lime">{player.stats.matchesPlayed}</span>
-                  <span className="text-marathon-light/20">|</span>
-                  <span>Minutos:</span>
-                  <span className="text-marathon-green">{player.stats.minutesPlayed}</span>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="highlightStat"
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: -20, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="text-[11px] font-heading font-bold text-marathon-lime flex items-center gap-1.5 uppercase tracking-wider"
-                >
-                  <span>{stat.label}:</span>
-                  <span className="text-marathon-light bg-marathon-green/40 px-2 py-0.5 rounded-full border border-marathon-green/30 text-xs">
-                    {stat.value}
-                  </span>
-                </motion.div>
-              )}
-            </AnimatePresence>
+          {/* NÚMERO EN LA ESQUINA INFERIOR DERECHA */}
+          <div className="flex-shrink-0 text-right">
+            <span className="text-[1.8rem] sm:text-[2.5rem] font-elrotex font-light text-marathon-lime group-hover:text-white group-hover:drop-shadow-[0_0_12px_rgba(146,191,78,0.8)] transition-all duration-300 leading-none block">
+              {player.number}
+            </span>
           </div>
         </div>
       </div>
 
       {/* ─────────────────────────────────────────────────────────────
-          3. LAYER JUGADOR + GARRAS DEL MONSTRUO EN ROJO PURO
-          Ubicadas más abajo (translate-y-8) sin filtros extra
+          3. LAYER JUGADOR + GARRAS DEL MONSTRUO (Blanco con Verde)
+          Efecto de iluminación doble aura blanca + verde lima neón
           ───────────────────────────────────────────────────────────── */}
       <div
-        className="absolute inset-x-0 bottom-[85px] h-[260px] flex items-end justify-center pointer-events-none transition-transform duration-500 z-30"
+        className="absolute inset-x-0 bottom-[65px] sm:bottom-[85px] h-[210px] xs:h-[230px] sm:h-[260px] flex items-end justify-center pointer-events-none transition-transform duration-500 z-30"
         style={{
-          transform: `translate3d(0, ${isHovered ? "-32px" : "0px"}, ${isHovered ? "60px" : "20px"}) scale(${isHovered ? 1.1 : 1})`,
+          transform: `translate3d(0, ${isHovered ? "-24px" : "0px"}, ${isHovered ? "60px" : "20px"}) scale(${isHovered ? 1.08 : 1})`,
         }}
       >
-        {/* LAS GARRAS DEL MONSTRUO (Rojo Puro) */}
+        {/* LAS GARRAS DEL MONSTRUO (Gradiente Blanco con Verde + Doble Aura Luminosa) */}
         <div
           className={cn(
-            "absolute inset-0 flex items-center justify-center transition-all duration-500 pointer-events-none z-0 translate-y-8",
+            "absolute inset-0 flex items-center justify-center transition-all duration-500 pointer-events-none z-0 translate-y-6 sm:translate-y-8",
             isHovered ? "opacity-100 scale-125 rotate-[-5deg]" : "opacity-0 scale-75 rotate-0"
           )}
         >
           <img
             src="/assets/hero/garras.svg"
-            alt="Garras del Monstruo Rojas"
-            className="w-[125%] h-[125%] object-contain filter drop-shadow-[0_4px_20px_rgba(237,28,36,0.5)]"
+            alt="Garras del Monstruo Blancas y Verdes"
+            className="w-[125%] h-[125%] object-contain filter drop-shadow-[0_0_25px_rgba(146,191,78,0.7)] drop-shadow-[0_0_12px_rgba(255,255,255,0.85)]"
           />
         </div>
 
@@ -216,16 +173,16 @@ const PlayerCard = React.memo(function PlayerCard({ player, onClick }: PlayerCar
                 console.error("Failed to load player reposo image:", player.image, e);
                 setImgError(true);
               }}
-              className="max-h-[250px] w-auto object-contain drop-shadow-lg"
+              className="max-h-[190px] xs:max-h-[210px] sm:max-h-[250px] w-auto object-contain drop-shadow-lg"
             />
           ) : (
-            <div className="relative h-[190px] w-auto flex items-end justify-center">
+            <div className="relative h-[150px] sm:h-[190px] w-auto flex items-end justify-center">
               <svg viewBox="0 0 100 100" className="h-full w-auto text-marathon-green/30 fill-currentColor">
                 <path d="M50 15c6.6 0 12 5.4 12 12s-5.4 12-12 12-12-5.4-12-12 5.4-12 12-12zm-25 50c0-11 9-20 20-20h10c11 0 20 9 20 20v15H25V65z" />
                 <circle cx="50" cy="50" r="14" className="text-marathon-lime/10 fill-currentColor" />
               </svg>
               <div className="absolute top-[48%] left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-30">
-                <Shield size={28} className="text-marathon-lime" />
+                <Shield size={24} className="text-marathon-lime" />
               </div>
             </div>
           )}
@@ -247,10 +204,10 @@ const PlayerCard = React.memo(function PlayerCard({ player, onClick }: PlayerCar
                 console.error("Failed to load player action image:", player.actionImage, e);
                 setActionImgError(true);
               }}
-              className="max-h-[260px] w-auto object-contain filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)]"
+              className="max-h-[200px] xs:max-h-[220px] sm:max-h-[260px] w-auto object-contain filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)]"
             />
           ) : player.category === "goalkeeper" ? (
-            <div className="relative h-[200px] w-auto flex items-end justify-center">
+            <div className="relative h-[160px] sm:h-[200px] w-auto flex items-end justify-center">
               <svg viewBox="0 0 100 100" className="h-full w-auto text-marathon-lime fill-currentColor filter drop-shadow-[0_0_15px_rgba(146,191,78,0.4)]">
                 <path d="M 68,22 C 70.8,22 73,19.8 73,17 C 73,14.2 70.8,12 68,12 C 63,14.2 63,17 C 63,19.8 65.2,22 68,22 Z 
                          M 88,14 C 88,12.9 87.1,12 86,12 C 81.3,15.1 76,21.5 73,26 L 62,35 C 59,37 56,38 52,38 L 40,38 C 36,38 32,40 30,43 L 15,62 C 14.1,63.1 14.2,64.7 15.3,65.6 C 16.4,66.5 18,66.4 18.9,65.3 L 33,48 L 47,48 C 50.8,48 54.4,46.5 57,44 L 84,21 C 86.8,18.6 88,16.2 88,14 Z 
@@ -260,7 +217,7 @@ const PlayerCard = React.memo(function PlayerCard({ player, onClick }: PlayerCar
               </svg>
             </div>
           ) : (
-            <div className="relative h-[200px] w-auto flex items-end justify-center">
+            <div className="relative h-[160px] sm:h-[200px] w-auto flex items-end justify-center">
               <svg viewBox="0 0 100 100" className="h-full w-auto text-marathon-lime fill-currentColor filter drop-shadow-[0_0_15px_rgba(146,191,78,0.4)]">
                 <path d="M 45,22 C 47.8,22 50,19.8 50,17 C 50,14.2 47.8,12 45,12 C 42.2,12 40,14.2 40,17 C 40,19.8 42.2,22 45,22 Z 
                          M 58,35 C 56,33 53,30 49,30 L 40,30 C 35,30 31,34 29,38 L 18,52 C 17.1,53.1 17.2,54.7 18.3,55.6 C 19.4,56.5 21,56.4 21.9,55.3 L 31,43 L 42,43 C 45,43 47,40 48,38 L 56,50 L 72,66 C 73.1,67.1 74.7,67.2 75.6,66.3 C 76.5,65.4 76.4,63.8 75.3,62.9 L 60,48 Z 

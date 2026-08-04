@@ -3,8 +3,8 @@
 // ============================================
 
 export const CLUB = {
-  name: "Club Deportivo Marathón",
-  shortName: "Marathón",
+  name: "Club Deportivo Marathon",
+  shortName: "Marathon",
   nickname: "Furia Verde",
   slogan: "Soy del verde, soy feliz",
   historicName: "El equipo de Paz Barahona",

@@ -214,15 +214,15 @@ export default function StatsSection() {
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[85vw] max-w-[850px] h-[450px] bg-gradient-to-tr from-marathon-lime/20 via-marathon-green/15 to-transparent rounded-full blur-[160px] pointer-events-none transform-gpu z-0" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
-        
+
         {/* Header Estilo Apple con FUENTE ELROTEX */}
         <div className="apple-stats-header text-center mb-12 sm:mb-16 md:mb-20 max-w-3xl mx-auto px-2">
-          <p className="text-xs sm:text-sm font-outfit font-bold uppercase tracking-[0.25em] text-marathon-green mb-3 sm:mb-4">
+          <p className="text-md sm:text-lg font-outfit font-bold text-marathon-green mb-3 sm:mb-4">
             Cien Años · En Números
           </p>
 
           <h2 className="text-3xl xs:text-4xl sm:text-6xl lg:text-7xl font-elrotex tracking-wide leading-[1.08] text-[#1D1D1F] uppercase mb-4 sm:mb-6 drop-shadow-sm">
-            La historia se mide en <span className="text-transparent bg-clip-text bg-gradient-to-r from-marathon-lime via-marathon-green to-marathon-dark">Grandeza.</span>
+            La historia se mide en <span className="text-transparent bg-clip-text pl-2 bg-gradient-to-r from-marathon-lime via-marathon-green to-marathon-dark">Grandeza.</span>
           </h2>
 
           <p className="text-xs xs:text-sm sm:text-base md:text-lg font-outfit text-[#86868B] font-normal leading-relaxed">
@@ -256,7 +256,7 @@ export default function StatsSection() {
 
               {/* Contenido Tipográfico Luminoso sobre Fondo Oscuro */}
               <div className="relative z-10 p-6 sm:p-8 lg:p-10 flex flex-col justify-end">
-                
+
                 {/* Número Gigante con Fuente Elrotex ELEGANTE */}
                 <div className="mb-1">
                   <span

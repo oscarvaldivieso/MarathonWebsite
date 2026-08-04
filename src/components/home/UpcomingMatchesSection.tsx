@@ -142,18 +142,10 @@ export default function UpcomingMatchesSection() {
               key={m.id}
               className="group relative w-[340px] md:w-[380px] flex-shrink-0 rounded-2xl border border-[#92BF4E]/30 bg-[#011a10] p-6 shadow-[0_15px_40px_rgba(0,0,0,0.7)] transition-all duration-300 hover:border-[#92BF4E] hover:shadow-[0_20px_50px_rgba(146,191,78,0.25)] overflow-hidden"
             >
-              {/* BRAND PATTERN OVERLAY ON EACH CARD */}
-              <div
-                className="absolute inset-0 pointer-events-none opacity-25 mix-blend-overlay rounded-2xl"
-                style={{
-                  backgroundImage: "url('/assets/brand/pattern.png')",
-                  backgroundRepeat: "repeat",
-                  backgroundSize: "160px auto",
-                }}
-              />
+
 
               {/* CARD TOP HEADER: TOURNAMENT & LOCAL/VISITANTE BADGE */}
-              <div className="relative z-10 flex items-center justify-between border-b border-white/10 pb-4 mb-4">
+              <div className="relative z-10 flex items-center justify-between pb-4 mb-2">
                 <div className="relative h-8 w-28 flex-shrink-0">
                   <Image
                     src={m.tournamentLogo}
@@ -165,11 +157,10 @@ export default function UpcomingMatchesSection() {
                 </div>
 
                 <div
-                  className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[0.65rem] font-bold uppercase tracking-wider ${
-                    m.isHome
-                      ? "bg-[#92BF4E] text-[#011610]"
-                      : "bg-amber-400 text-[#011610]"
-                  }`}
+                  className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[0.65rem] font-bold uppercase tracking-wider ${m.isHome
+                    ? "bg-[#92BF4E] text-[#011610]"
+                    : "bg-amber-400 text-[#011610]"
+                    }`}
                   style={{ fontFamily: "var(--font-outfit)" }}
                 >
                   {m.isHome ? (
@@ -187,49 +178,63 @@ export default function UpcomingMatchesSection() {
               </div>
 
               {/* TEAM CRESTS & CLASH NAMES */}
-              <div className="relative z-10 grid grid-cols-5 items-center gap-2 text-center py-2">
-                {/* HOME */}
-                <div className="col-span-2 flex flex-col items-center">
-                  <div className="relative w-16 h-16 mb-2 transition-transform group-hover:scale-105">
-                    <Image
-                      src={m.homeLogo}
-                      alt={m.home}
-                      fill
-                      sizes="64px"
-                      className="object-contain drop-shadow-md"
-                    />
-                  </div>
-                  <span className="font-elrotex uppercase text-sm md:text-base text-white tracking-wider truncate max-w-full">
-                    {m.home}
-                  </span>
-                </div>
+              <div className="relative z-10 rounded-xl overflow-hidden border border-[#92BF4E]/20 bg-[#010f09] px-4 py-5 my-1 shadow-inner">
+                {/* Brand Pattern — only inside this clash container */}
+                <div
+                  className="absolute inset-0 pointer-events-none opacity-[0.5] "
+                  style={{
+                    backgroundImage: "url('/assets/brand/pattern.png')",
+                    backgroundRepeat: "repeat",
+                    backgroundSize: "140px auto",
+                  }}
+                />
+                {/* Subtle inner lime glow */}
+                <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,_rgba(146,191,78,0.12)_0%,_transparent_70%)]" />
 
-                {/* VS BADGE */}
-                <div className="col-span-1 flex items-center justify-center">
-                  <span className="font-elrotex text-3xl text-[#92BF4E] leading-none drop-shadow-[0_0_10px_rgba(146,191,78,0.6)]">
-                    VS
-                  </span>
-                </div>
-
-                {/* AWAY */}
-                <div className="col-span-2 flex flex-col items-center">
-                  <div className="relative w-16 h-16 mb-2 transition-transform group-hover:scale-105">
-                    <Image
-                      src={m.awayLogo}
-                      alt={m.away}
-                      fill
-                      sizes="64px"
-                      className="object-contain drop-shadow-md"
-                    />
+                <div className="relative z-10 grid grid-cols-5 items-center gap-2 text-center">
+                  {/* HOME */}
+                  <div className="col-span-2 flex flex-col items-center">
+                    <div className="relative w-16 h-16 mb-2 transition-transform group-hover:scale-105">
+                      <Image
+                        src={m.homeLogo}
+                        alt={m.home}
+                        fill
+                        sizes="64px"
+                        className="object-contain drop-shadow-md"
+                      />
+                    </div>
+                    <span className="font-elrotex uppercase text-sm md:text-base text-white tracking-wider truncate max-w-full">
+                      {m.home}
+                    </span>
                   </div>
-                  <span className="font-elrotex uppercase text-sm md:text-base text-white tracking-wider truncate max-w-full">
-                    {m.away}
-                  </span>
+
+                  {/* VS BADGE */}
+                  <div className="col-span-1 flex items-center justify-center">
+                    <span className="font-elrotex text-3xl text-[#92BF4E] leading-none drop-shadow-[0_0_10px_rgba(146,191,78,0.6)]">
+                      VS
+                    </span>
+                  </div>
+
+                  {/* AWAY */}
+                  <div className="col-span-2 flex flex-col items-center">
+                    <div className="relative w-16 h-16 mb-2 transition-transform group-hover:scale-105">
+                      <Image
+                        src={m.awayLogo}
+                        alt={m.away}
+                        fill
+                        sizes="64px"
+                        className="object-contain drop-shadow-md"
+                      />
+                    </div>
+                    <span className="font-elrotex uppercase text-sm md:text-base text-white tracking-wider truncate max-w-full">
+                      {m.away}
+                    </span>
+                  </div>
                 </div>
               </div>
 
               {/* METADATA FOOTER: DATE, TIME, VENUE */}
-              <div className="relative z-10 border-t border-white/10 pt-4 mt-4 flex flex-col gap-2 text-xs text-white/70" style={{ fontFamily: "var(--font-outfit)" }}>
+              <div className="relative z-10  pt-4 mt-4 flex flex-col gap-2 text-xs text-white/70" style={{ fontFamily: "var(--font-outfit)" }}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5 font-medium text-white/90">
                     <Calendar className="w-3.5 h-3.5 text-[#92BF4E]" />
